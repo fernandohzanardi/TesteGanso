@@ -1,0 +1,173 @@
+unit uCadastroPadrao;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Data.DB, IBX.IBQuery,
+  IBX.IBDatabase, IBX.IBCustomDataSet, IBX.IBUpdateSQL;
+
+type
+  TfrmCadastroPadrao = class(TForm)
+    pCampos: TPanel;
+    pBotoes: TPanel;
+    btnPrimeiro: TButton;
+    btnAnterior: TButton;
+    btnProximo: TButton;
+    btnUltimo: TButton;
+    btnInserir: TButton;
+    btnEditar: TButton;
+    btnGravar: TButton;
+    btnCancelar: TButton;
+    btnExcluir: TButton;
+    dsCadastro: TDataSource;
+    IBTransaction: TIBTransaction;
+    ibqCadastro: TIBQuery;
+    IBUpdateSQLCadastro: TIBUpdateSQL;
+    procedure btnCancelarClick(Sender: TObject);
+    procedure btnEditarClick(Sender: TObject);
+    procedure btnInserirClick(Sender: TObject);
+    procedure btnExcluirClick(Sender: TObject);
+    procedure btnGravarClick(Sender: TObject);
+    procedure btnAnteriorClick(Sender: TObject);
+    procedure btnPrimeiroClick(Sender: TObject);
+    procedure btnProximoClick(Sender: TObject);
+    procedure btnUltimoClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure dsCadastroDataChange(Sender: TObject; Field: TField);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+  private
+    procedure HabilitaBotoes;
+    procedure HabilitaBotoesNav;
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmCadastroPadrao: TfrmCadastroPadrao;
+
+implementation
+
+
+{$R *.dfm}
+
+procedure TfrmCadastroPadrao.btnAnteriorClick(Sender: TObject);
+begin
+  ibqCadastro.Prior;
+end;
+
+procedure TfrmCadastroPadrao.btnCancelarClick(Sender: TObject);
+begin
+  if (dsCadastro.DataSet.state in [dsInsert, dsEdit]) then
+    ibqCadastro.Cancel;
+end;
+
+procedure TfrmCadastroPadrao.btnEditarClick(Sender: TObject);
+begin
+  ibqCadastro.Edit;
+end;
+
+procedure TfrmCadastroPadrao.btnExcluirClick(Sender: TObject);
+begin
+  if not MessageDlg('Confirma Exclusão?',
+    mtConfirmation, [mbYes, mbNo], 0, mbYes) = mrYes then
+    exit;
+
+  if (not ibqCadastro.Transaction.InTransaction) then
+    ibqCadastro.Transaction.StartTransaction;
+
+   try
+     ibqCadastro.Delete;
+
+     ibqCadastro.Transaction.CommitRetaining;
+   Except
+     ibqCadastro.Transaction.RollbackRetaining;
+     ShowMessage('Erro ao Excluir!');
+   end;
+end;
+
+procedure TfrmCadastroPadrao.btnGravarClick(Sender: TObject);
+begin
+  if (not ibqCadastro.Transaction.InTransaction) then
+    ibqCadastro.Transaction.StartTransaction;
+
+   try
+     ibqCadastro.UpdateRecord;
+
+     if ibqCadastro.State in [dsInsert, dsEdit] then
+       ibqCadastro.Post;
+
+     ibqCadastro.Transaction.CommitRetaining;
+     ibqCadastro.Refresh;
+
+   Except
+     ibqCadastro.Transaction.RollbackRetaining;
+     ShowMessage('Erro ao Salvar!');
+   end;
+
+end;
+
+procedure TfrmCadastroPadrao.btnInserirClick(Sender: TObject);
+begin
+  ibqCadastro.Append;
+end;
+
+procedure TfrmCadastroPadrao.btnPrimeiroClick(Sender: TObject);
+begin
+  ibqCadastro.First;
+end;
+
+procedure TfrmCadastroPadrao.btnProximoClick(Sender: TObject);
+begin
+  ibqCadastro.Next;
+end;
+
+procedure TfrmCadastroPadrao.btnUltimoClick(Sender: TObject);
+begin
+  ibqCadastro.Last;
+end;
+
+procedure TfrmCadastroPadrao.dsCadastroDataChange(Sender: TObject;
+  Field: TField);
+begin
+  HabilitaBotoes;
+  HabilitaBotoesNav;
+end;
+
+procedure TfrmCadastroPadrao.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  Action := caFree;
+end;
+
+procedure TfrmCadastroPadrao.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  case key of
+    VK_ESCAPE: Close;  
+  end;
+end;
+
+procedure TfrmCadastroPadrao.HabilitaBotoes;
+begin
+  btnInserir.Enabled := not (ibqCadastro.State in dsEditModes);
+  btnEditar.Enabled := btnInserir.Enabled and (not ibqCadastro.IsEmpty);
+  btnExcluir.Enabled := btnInserir.Enabled and (not ibqCadastro.IsEmpty);
+  btnGravar.Enabled := not btnInserir.Enabled;
+  btnCancelar.Enabled := not btnInserir.Enabled;
+
+  pCampos.Enabled := not btnInserir.Enabled;
+ end;
+
+procedure TfrmCadastroPadrao.HabilitaBotoesNav;
+begin
+
+  btnPrimeiro.Enabled := not ibqCadastro.Bof and ibqCadastro.State in [dsBrowse];
+  btnAnterior.Enabled := not ibqCadastro.Bof and ibqCadastro.State in [dsBrowse];
+
+  btnProximo.Enabled := not ibqCadastro.Eof and ibqCadastro.State in [dsBrowse];
+  btnUltimo.Enabled := not ibqCadastro.Eof and ibqCadastro.State in [dsBrowse];
+end;
+
+end.

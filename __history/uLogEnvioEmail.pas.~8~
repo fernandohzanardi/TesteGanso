@@ -1,0 +1,393 @@
+unit uLogEnvioEmail;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.ComCtrls, Vcl.Grids, Vcl.DBGrids, Vcl.DBCtrls, Vcl.Mask, Data.DB,
+  IBX.IBDatabase, IBX.IBQuery, IBX.IBCustomDataSet;
+
+type
+  TfrmLogEnvioEmail = class(TForm)
+    pFiltros: TPanel;
+    pRodape: TPanel;
+    lPeriodo: TLabel;
+    lAte: TLabel;
+    lSituacao: TLabel;
+    lOrigem: TLabel;
+    lCliente: TLabel;
+
+    dtpDataInicial: TDateTimePicker;
+    dtpDataFinal: TDateTimePicker;
+    cbSituacao: TComboBox;
+    cbOrigem: TComboBox;
+    eCodigoCliente: TEdit;
+
+    btnConsultar: TButton;
+    btnLimpar: TButton;
+    btnVerDetalhes: TButton;
+    btnExportarCSV: TButton;
+    btnFechar: TButton;
+
+    dbgLog: TDBGrid;
+    stbStatus: TStatusBar;
+
+    dsLog: TDataSource;
+    ibqLog: TIBQuery;
+    IBTransactionLog: TIBTransaction;
+
+    ibqLogCODIGO: TIntegerField;
+    ibqLogDESTINATARIO: TIBStringField;
+    ibqLogREMETENTE: TIBStringField;
+    ibqLogASSUNTO: TIBStringField;
+    ibqLogCORPO: TMemoField;
+    ibqLogSITUACAO: TIBStringField;
+    ibqLogMENSAGEM_ERRO: TIBStringField;
+    ibqLogUSUARIO_SO: TIBStringField;
+    ibqLogMAQUINA: TIBStringField;
+    ibqLogORIGEM: TIBStringField;
+    ibqLogCODIGO_CLIENTE: TIntegerField;
+    ibqLogNOME_CLIENTE: TIBStringField;
+    ibqLogDATA_HORA_ENVIO: TSQLTimeStampField;
+
+    procedure FormActivate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure btnConsultarClick(Sender: TObject);
+    procedure btnLimparClick(Sender: TObject);
+    procedure btnFecharClick(Sender: TObject);
+    procedure btnVerDetalhesClick(Sender: TObject);
+    procedure btnExportarCSVClick(Sender: TObject);
+    procedure dbgLogDblClick(Sender: TObject);
+    procedure dbgLogDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+  strict private
+    procedure CarregarComboSituacao;
+    procedure CarregarComboOrigem;
+    procedure MontarSQL;
+    procedure AtualizarStatus;
+    function GetSituacaoAtual: string;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmLogEnvioEmail: TfrmLogEnvioEmail;
+
+implementation
+
+{$R *.dfm}
+
+uses
+  System.DateUtils, System.StrUtils, uConexao;
+
+procedure TfrmLogEnvioEmail.FormActivate(Sender: TObject);
+begin
+  CarregarComboSituacao;
+  CarregarComboOrigem;
+
+  if dtpDataInicial.Tag = 0 then
+  begin
+    dtpDataInicial.Date := StartOfTheMonth(Date);
+    dtpDataFinal.Date := Date;
+    dtpDataInicial.Tag := 1;
+  end;
+
+  MontarSQL;
+end;
+
+procedure TfrmLogEnvioEmail.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  Action := caFree;
+  frmLogEnvioEmail := Nil;
+end;
+
+procedure TfrmLogEnvioEmail.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  case Key of
+    VK_ESCAPE: Close;
+    VK_F5:     btnConsultar.Click;
+  end;
+end;
+
+procedure TfrmLogEnvioEmail.CarregarComboSituacao;
+begin
+  cbSituacao.Items.Clear;
+  cbSituacao.Items.Add('(Todas)');
+  cbSituacao.Items.Add('Sucesso');
+  cbSituacao.Items.Add('Falha');
+  cbSituacao.ItemIndex := 0;
+end;
+
+procedure TfrmLogEnvioEmail.CarregarComboOrigem;
+var
+  lTransacao: TIBTransaction;
+  lQuery: TIBQuery;
+begin
+  cbOrigem.Items.Clear;
+  cbOrigem.Items.Add('(Todas)');
+
+  lTransacao := TIBTransaction.Create(nil);
+  lQuery := TIBQuery.Create(nil);
+  try
+    lTransacao.DefaultDatabase := dmConexao.IBDConexao;
+    lTransacao.Params.Text := 'read_committed'#13#10'rec_version'#13#10'nowait';
+    lTransacao.StartTransaction;
+    try
+      lQuery.Database := dmConexao.IBDConexao;
+      lQuery.Transaction := lTransacao;
+      lQuery.SQL.Text :=
+        'SELECT DISTINCT ORIGEM FROM LOG_ENVIO_EMAIL ' +
+        'WHERE ORIGEM IS NOT NULL ORDER BY 1';
+      lQuery.Open;
+      while not lQuery.Eof do
+      begin
+        cbOrigem.Items.Add(lQuery.FieldByName('ORIGEM').AsString);
+        lQuery.Next;
+      end;
+      lQuery.Close;
+      lTransacao.Commit;
+    except
+      if lTransacao.InTransaction then
+        lTransacao.Rollback;
+    end;
+  finally
+    lQuery.Free;
+    lTransacao.Free;
+  end;
+
+  cbOrigem.ItemIndex := 0;
+end;
+
+function TfrmLogEnvioEmail.GetSituacaoAtual: string;
+begin
+  case cbSituacao.ItemIndex of
+    1: Result := 'S';
+    2: Result := 'F';
+  else
+    Result := '';
+  end;
+end;
+
+procedure TfrmLogEnvioEmail.MontarSQL;
+var
+  lSQL: TStringList;
+  lSituacao: string;
+begin
+  lSQL := TStringList.Create;
+  try
+    lSQL.Add('SELECT L.CODIGO, L.DATA_HORA_ENVIO, L.DESTINATARIO, L.REMETENTE,');
+    lSQL.Add('       L.ASSUNTO, L.CORPO, L.SITUACAO, L.MENSAGEM_ERRO,         ');
+    lSQL.Add('       L.USUARIO_SO, L.MAQUINA, L.ORIGEM,                       ');
+    lSQL.Add('       L.CODIGO_CLIENTE, C.NOME AS NOME_CLIENTE                 ');
+    lSQL.Add('FROM LOG_ENVIO_EMAIL L                                          ');
+    lSQL.Add('LEFT JOIN CLIENTE C ON C.CODIGO = L.CODIGO_CLIENTE              ');
+    lSQL.Add('WHERE L.DATA_HORA_ENVIO BETWEEN :DATA_INICIAL AND :DATA_FINAL   ');
+
+    lSituacao := GetSituacaoAtual;
+    if lSituacao <> '' then
+      lSQL.Add('  AND L.SITUACAO = :SITUACAO');
+
+    if cbOrigem.ItemIndex > 0 then
+      lSQL.Add('  AND L.ORIGEM = :ORIGEM');
+
+    if Trim(eCodigoCliente.Text) <> '' then
+      lSQL.Add('  AND L.CODIGO_CLIENTE = :CODIGO_CLIENTE');
+
+    lSQL.Add('ORDER BY L.DATA_HORA_ENVIO DESC');
+
+    ibqLog.Close;
+    ibqLog.SQL.Assign(lSQL);
+    ibqLog.ParamByName('DATA_INICIAL').AsDateTime := dtpDataInicial.DateTime//DateOf(dtpDataInicial.DateTime);
+    ibqLog.ParamByName('DATA_FINAL').AsDateTime   := dtpDataFinal.DateTime//EndOfTheDay(dtpDataFinal.DateTime);
+
+    if lSituacao <> '' then
+      ibqLog.ParamByName('SITUACAO').AsString := lSituacao;
+    if cbOrigem.ItemIndex > 0 then
+      ibqLog.ParamByName('ORIGEM').AsString := cbOrigem.Text;
+    if Trim(eCodigoCliente.Text) <> '' then
+      ibqLog.ParamByName('CODIGO_CLIENTE').AsInteger :=
+        StrToIntDef(Trim(eCodigoCliente.Text), 0);
+
+    try
+      ibqLog.Open;
+    except
+      on E: Exception do
+      begin
+        ShowMessage('Erro ao consultar log: ' + E.Message);
+        Exit;
+      end;
+    end;
+
+    AtualizarStatus;
+  finally
+    lSQL.Free;
+  end;
+end;
+
+procedure TfrmLogEnvioEmail.AtualizarStatus;
+var
+  lSucessos: Integer;
+  lFalhas: Integer;
+begin
+  lSucessos := 0;
+  lFalhas := 0;
+
+  ibqLog.DisableControls;
+  try
+    ibqLog.First;
+    while not ibqLog.Eof do
+    begin
+      if ibqLogSITUACAO.AsString = 'S' then
+        Inc(lSucessos);
+      if ibqLogSITUACAO.AsString = 'F' then
+        Inc(lFalhas);
+      ibqLog.Next;
+    end;
+    ibqLog.First;
+  finally
+    ibqLog.EnableControls;
+  end;
+
+  stbStatus.Panels[0].Text := Format('Total: %d', [lSucessos + lFalhas]);
+  stbStatus.Panels[1].Text := Format('Sucessos: %d', [lSucessos]);
+  stbStatus.Panels[2].Text := Format('Falhas: %d', [lFalhas]);
+end;
+
+procedure TfrmLogEnvioEmail.btnConsultarClick(Sender: TObject);
+begin
+  MontarSQL;
+end;
+
+procedure TfrmLogEnvioEmail.btnLimparClick(Sender: TObject);
+begin
+  dtpDataInicial.Date := StartOfTheMonth(Date);
+  dtpDataFinal.Date := Date;
+  cbSituacao.ItemIndex := 0;
+  cbOrigem.ItemIndex := 0;
+  eCodigoCliente.Clear;
+  MontarSQL;
+end;
+
+procedure TfrmLogEnvioEmail.btnFecharClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TfrmLogEnvioEmail.btnVerDetalhesClick(Sender: TObject);
+var
+  lDetalhes: TStringList;
+begin
+  if ibqLog.IsEmpty then
+    Exit;
+
+  lDetalhes := TStringList.Create;
+  try
+//    lDetalhes.Add('Data/Hora   : ' +
+//      FormatDateTime('dd/mm/yyyy hh:nn:ss', ibqLogDATA_HORA_ENVIO.AsDateTime));
+
+
+    //DataHora := TimeStampToDateTime(MeuTimeStamp);
+    //Resultado := FormatDateTime('dd/mm/yyyy hh:nn:ss.zzz', DataHora);
+
+//      FormatDateTime('dd/mm/yyyy hh:nn:ss', ibqLogDATA_HORA_ENVIO.AsSQLTimeStamp));
+    lDetalhes.Add('Situacao    : ' +
+      IfThen(ibqLogSITUACAO.AsString = 'S', 'Sucesso', 'Falha'));
+    lDetalhes.Add('Destinatario: ' + ibqLogDESTINATARIO.AsString);
+    lDetalhes.Add('Remetente   : ' + ibqLogREMETENTE.AsString);
+    lDetalhes.Add('Assunto     : ' + ibqLogASSUNTO.AsString);
+    lDetalhes.Add('Origem      : ' + ibqLogORIGEM.AsString);
+    lDetalhes.Add('Usuario SO  : ' + ibqLogUSUARIO_SO.AsString);
+    lDetalhes.Add('Maquina     : ' + ibqLogMAQUINA.AsString);
+    if not ibqLogCODIGO_CLIENTE.IsNull then
+      lDetalhes.Add('Cliente     : ' + ibqLogCODIGO_CLIENTE.AsString + ' - ' +
+        ibqLogNOME_CLIENTE.AsString);
+    lDetalhes.Add('');
+    lDetalhes.Add('--- Corpo ---');
+    lDetalhes.Add(ibqLogCORPO.AsString);
+
+    if ibqLogSITUACAO.AsString = 'F' then
+    begin
+      lDetalhes.Add('');
+      lDetalhes.Add('--- Erro ---');
+      lDetalhes.Add(ibqLogMENSAGEM_ERRO.AsString);
+    end;
+
+    ShowMessage(lDetalhes.Text);
+  finally
+    lDetalhes.Free;
+  end;
+end;
+
+procedure TfrmLogEnvioEmail.dbgLogDblClick(Sender: TObject);
+begin
+  btnVerDetalhesClick(Sender);
+end;
+
+procedure TfrmLogEnvioEmail.dbgLogDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  if (Column.FieldName = 'SITUACAO') and (not (gdSelected in State)) then
+  begin
+    if ibqLogSITUACAO.AsString = 'S' then
+      dbgLog.Canvas.Font.Color := clGreen;
+    if ibqLogSITUACAO.AsString = 'F' then
+      dbgLog.Canvas.Font.Color := clRed;
+  end;
+  dbgLog.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+end;
+
+procedure TfrmLogEnvioEmail.btnExportarCSVClick(Sender: TObject);
+var
+  lDlg: TSaveDialog;
+  lArquivo: TStringList;
+  lLinha: string;
+begin
+  if ibqLog.IsEmpty then
+    Exit;
+
+  lDlg := TSaveDialog.Create(nil);
+  lArquivo := TStringList.Create;
+  try
+    lDlg.Filter := 'Arquivo CSV|*.csv';
+    lDlg.DefaultExt := 'csv';
+    lDlg.FileName := 'log_envio_email_' +
+                     FormatDateTime('yyyymmdd_hhnnss', Now) + '.csv';
+    if not lDlg.Execute then
+      Exit;
+
+    lArquivo.Add('CODIGO;DATA_HORA;DESTINATARIO;ASSUNTO;SITUACAO;ORIGEM;ERRO');
+
+    ibqLog.DisableControls;
+    try
+      ibqLog.First;
+      while not ibqLog.Eof do
+      begin
+        lLinha :=
+          ibqLogCODIGO.AsString + ';' +
+//          FormatDateTime('dd/mm/yyyy hh:nn:ss', ibqLogDATA_HORA_ENVIO.AsDateTime) + ';' +
+          ibqLogDESTINATARIO.AsString + ';' +
+          StringReplace(ibqLogASSUNTO.AsString, ';', ',', [rfReplaceAll]) + ';' +
+          IfThen(ibqLogSITUACAO.AsString = 'S', 'Sucesso', 'Falha') + ';' +
+          ibqLogORIGEM.AsString + ';' +
+          StringReplace(ibqLogMENSAGEM_ERRO.AsString, ';', ',', [rfReplaceAll]);
+        lArquivo.Add(lLinha);
+        ibqLog.Next;
+      end;
+      ibqLog.First;
+    finally
+      ibqLog.EnableControls;
+    end;
+
+    lArquivo.SaveToFile(lDlg.FileName, TEncoding.ANSI);
+    ShowMessage('Arquivo gerado com sucesso!');
+  finally
+    lArquivo.Free;
+    lDlg.Free;
+  end;
+end;
+
+end.

@@ -1,0 +1,313 @@
+object frmVendaPagamento: TfrmVendaPagamento
+  Left = 0
+  Top = 0
+  BorderStyle = bsDialog
+  Caption = 'Pagamento da Venda'
+  ClientHeight = 420
+  ClientWidth = 640
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
+  Font.Style = []
+  KeyPreview = True
+  Position = poMainFormCenter
+  OnClose = FormClose
+  OnKeyDown = FormKeyDown
+  OnShow = FormShow
+  TextHeight = 15
+  object pTopo: TPanel
+    Left = 0
+    Top = 0
+    Width = 640
+    Height = 56
+    Align = alTop
+    BevelOuter = bvNone
+    TabOrder = 0
+    object lTotalVendaCaption: TLabel
+      Left = 16
+      Top = 18
+      Width = 80
+      Height = 15
+      Caption = 'Total da venda:'
+    end
+    object lTotalVendaValor: TLabel
+      Left = 104
+      Top = 18
+      Width = 24
+      Height = 15
+      Caption = '0,00'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object lSomaPagamentosCaption: TLabel
+      Left = 320
+      Top = 18
+      Width = 124
+      Height = 15
+      Caption = 'Soma dos pagamentos:'
+    end
+    object lSomaPagamentosValor: TLabel
+      Left = 448
+      Top = 18
+      Width = 24
+      Height = 15
+      Caption = '0,00'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+  end
+  object dbgPagamento: TDBGrid
+    Left = 0
+    Top = 56
+    Width = 640
+    Height = 308
+    Align = alClient
+    DataSource = dsPagamento
+    TabOrder = 1
+    TitleFont.Charset = DEFAULT_CHARSET
+    TitleFont.Color = clWindowText
+    TitleFont.Height = -12
+    TitleFont.Name = 'Segoe UI'
+    TitleFont.Style = []
+    Columns = <
+      item
+        Expanded = False
+        FieldName = 'CODIGO_FORMA_PAGAMENTO'
+        Title.Caption = 'Forma'
+        Width = 60
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'DESCRICAO_FORMA'
+        ReadOnly = True
+        Title.Caption = 'Descri'#231#227'o'
+        Width = 180
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'VALOR'
+        Title.Caption = 'Valor'
+        Width = 100
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'PARCELAS'
+        Title.Caption = 'Parcelas'
+        Width = 70
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'VENCIMENTO'
+        Title.Caption = 'Vencimento'
+        Width = 100
+        Visible = True
+      end>
+  end
+  object pBotoes: TPanel
+    Left = 0
+    Top = 364
+    Width = 640
+    Height = 56
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 2
+    object btnAdicionar: TButton
+      Left = 16
+      Top = 14
+      Width = 100
+      Height = 28
+      Caption = 'Adicionar'
+      TabOrder = 0
+      OnClick = btnAdicionarClick
+    end
+    object btnRemover: TButton
+      Left = 124
+      Top = 14
+      Width = 100
+      Height = 28
+      Caption = 'Remover'
+      TabOrder = 1
+      OnClick = btnRemoverClick
+    end
+    object btnConfirmar: TButton
+      Left = 420
+      Top = 14
+      Width = 100
+      Height = 28
+      Caption = 'Confirmar'
+      Default = True
+      TabOrder = 2
+      OnClick = btnConfirmarClick
+    end
+    object btnCancelar: TButton
+      Left = 528
+      Top = 14
+      Width = 100
+      Height = 28
+      Cancel = True
+      Caption = 'Cancelar'
+      ModalResult = 2
+      TabOrder = 3
+      OnClick = btnCancelarClick
+    end
+  end
+  object ibqPagamento: TIBQuery
+    Database = dmConexao.IBDConexao
+    OnNewRecord = ibqPagamentoNewRecord
+    Active = True
+    BufferChunks = 1000
+    CachedUpdates = True
+    ParamCheck = True
+    SQL.Strings = (
+      'SELECT'
+      '  CODIGO,'
+      '  CODIGO_VENDA,'
+      '  CODIGO_FORMA_PAGAMENTO,'
+      '  VALOR,'
+      '  PARCELAS,'
+      '  VENCIMENTO'
+      'FROM VENDA_PAGAMENTO'
+      'WHERE CODIGO_VENDA = :COD'
+      'ORDER BY CODIGO')
+    UpdateObject = IBUpdateSQLPagamento
+    GeneratorField.Field = 'CODIGO'
+    GeneratorField.Generator = 'GEN_VENDA_PAGAMENTO_ID'
+    GeneratorField.ApplyEvent = gamOnServer
+    PrecommittedReads = False
+    Left = 40
+    Top = 120
+    ParamData = <
+      item
+        DataType = ftUnknown
+        Name = 'COD'
+        ParamType = ptUnknown
+      end>
+    object ibqPagamentoCODIGO: TIntegerField
+      FieldName = 'CODIGO'
+      Origin = 'VENDA_PAGAMENTO.CODIGO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object ibqPagamentoCODIGO_VENDA: TIntegerField
+      FieldName = 'CODIGO_VENDA'
+      Origin = 'VENDA_PAGAMENTO.CODIGO_VENDA'
+      Required = True
+    end
+    object ibqPagamentoCODIGO_FORMA_PAGAMENTO: TIntegerField
+      FieldName = 'CODIGO_FORMA_PAGAMENTO'
+      Origin = 'VENDA_PAGAMENTO.CODIGO_FORMA_PAGAMENTO'
+      Required = True
+    end
+    object ibqPagamentoVALOR: TIBBCDField
+      FieldName = 'VALOR'
+      Origin = 'VENDA_PAGAMENTO.VALOR'
+      Required = True
+      Precision = 18
+      Size = 2
+    end
+    object ibqPagamentoPARCELAS: TIntegerField
+      FieldName = 'PARCELAS'
+      Origin = 'VENDA_PAGAMENTO.PARCELAS'
+    end
+    object ibqPagamentoVENCIMENTO: TDateField
+      FieldName = 'VENCIMENTO'
+      Origin = 'VENDA_PAGAMENTO.VENCIMENTO'
+    end
+  end
+  object IBUpdateSQLPagamento: TIBUpdateSQL
+    RefreshSQL.Strings = (
+      'Select '
+      '  CODIGO,'
+      '  CODIGO_VENDA,'
+      '  CODIGO_FORMA_PAGAMENTO,'
+      '  VALOR,'
+      '  PARCELAS,'
+      '  VENCIMENTO'
+      'from VENDA_PAGAMENTO '
+      'where'
+      '  CODIGO = :CODIGO')
+    ModifySQL.Strings = (
+      'update VENDA_PAGAMENTO'
+      'set'
+      '  CODIGO_VENDA = :CODIGO_VENDA,'
+      '  CODIGO_FORMA_PAGAMENTO = :CODIGO_FORMA_PAGAMENTO,'
+      '  VALOR = :VALOR,'
+      '  PARCELAS = :PARCELAS,'
+      '  VENCIMENTO = :VENCIMENTO'
+      'where'
+      '  CODIGO = :OLD_CODIGO')
+    InsertSQL.Strings = (
+      'insert into VENDA_PAGAMENTO'
+      
+        '  (CODIGO_VENDA, CODIGO_FORMA_PAGAMENTO, VALOR, PARCELAS, VENCIM' +
+        'ENTO)'
+      'values'
+      
+        '  (:CODIGO_VENDA, :CODIGO_FORMA_PAGAMENTO, :VALOR, :PARCELAS, :V' +
+        'ENCIMENTO)')
+    DeleteSQL.Strings = (
+      'delete from VENDA_PAGAMENTO'
+      'where'
+      '  CODIGO = :OLD_CODIGO')
+    Left = 136
+    Top = 120
+  end
+  object dsPagamento: TDataSource
+    DataSet = ibqPagamento
+    OnDataChange = dsPagamentoDataChange
+    Left = 40
+    Top = 184
+  end
+  object ibqFormas: TIBQuery
+    Database = dmConexao.IBDConexao
+    Active = True
+    BufferChunks = 1000
+    CachedUpdates = False
+    ParamCheck = True
+    SQL.Strings = (
+      'SELECT CODIGO, DESCRICAO, GERA_TITULO'
+      'FROM FORMA_PAGAMENTO'
+      'WHERE ATIVO = '#39'A'#39
+      'ORDER BY DESCRICAO')
+    PrecommittedReads = False
+    Left = 232
+    Top = 120
+    object ibqFormasCODIGO: TIntegerField
+      FieldName = 'CODIGO'
+      Origin = 'FORMA_PAGAMENTO.CODIGO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object ibqFormasDESCRICAO: TIBStringField
+      FieldName = 'DESCRICAO'
+      Origin = 'FORMA_PAGAMENTO.DESCRICAO'
+      Required = True
+      Size = 60
+    end
+    object ibqFormasGERA_TITULO: TIBStringField
+      FieldName = 'GERA_TITULO'
+      Origin = 'FORMA_PAGAMENTO.GERA_TITULO'
+      FixedChar = True
+      Size = 1
+    end
+  end
+  object dsFormas: TDataSource
+    DataSet = ibqFormas
+    Left = 232
+    Top = 184
+  end
+end

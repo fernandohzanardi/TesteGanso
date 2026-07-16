@@ -1,0 +1,162 @@
+unit uCadastroVendasItens;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uCadastroPadrao, IBX.IBCustomDataSet,
+  IBX.IBUpdateSQL, Data.DB, IBX.IBQuery, IBX.IBDatabase, Vcl.StdCtrls,
+  Vcl.ExtCtrls, Vcl.Mask, Vcl.DBCtrls, uCalculaFuncoesFinanceiras;
+
+type
+  TfrmCadastroVendasItens = class(TfrmCadastroPadrao)
+    Label1: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
+    dbeCodigo: TDBEdit;
+    dbeCodigoProduto: TDBEdit;
+    dbeQuantidade: TDBEdit;
+    dbePrecoUnitario: TDBEdit;
+    dbeDesconto: TDBEdit;
+    dbeAcrescimo: TDBEdit;
+    dbeTotalLiquido: TDBEdit;
+    dbeDescricaoProduto: TDBEdit;
+    dsProduto: TDataSource;
+    ibqProduto: TIBQuery;
+    procedure btnInserirClick(Sender: TObject);
+    procedure btnGravarClick(Sender: TObject);
+    procedure btnExcluirClick(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure dbeQuantidadeExit(Sender: TObject);
+    procedure dbeDescontoChange(Sender: TObject);
+    procedure dbeCodigoProdutoChange(Sender: TObject);
+    procedure dbeAcrescimoChange(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmCadastroVendasItens: TfrmCadastroVendasItens;
+
+implementation
+
+uses
+  uVendas;
+
+{$R *.dfm}
+
+procedure TfrmCadastroVendasItens.btnExcluirClick(Sender: TObject);
+begin
+  inherited;
+
+  if not (ibqProduto.State in [dsInactive]) then
+  ibqProduto.Close;
+end;
+
+procedure TfrmCadastroVendasItens.btnGravarClick(Sender: TObject);
+begin
+ if (ibqProduto.IsEmpty) then
+ begin
+   showMessage('Produto não Localizado!');
+   exit;
+ end;
+
+ if ((ibqCadastro.FieldByName('QUANTIDADE').IsNull) or (ibqVendaitem.FieldByName('QUANTIDADE').AsFloat = 0)) then
+ begin
+   showMessage('Quantidade deve ser maior do que 0!');
+   exit;
+ end;
+
+  if (ibqCadastro.State in [dsInsert, dsEdit]) then
+    ibqCadastro.UpdateRecord;
+
+  inherited;
+end;
+
+procedure TfrmCadastroVendasItens.btnInserirClick(Sender: TObject);
+begin
+  inherited;
+
+  if not (ibqProduto.State in [dsInactive]) then
+    ibqProduto.Close;
+
+  ibqCadastro.FieldByName('CODIGO_VENDA').AsInteger := frmVendas.ibqVenda.FieldByName('CODIGO').AsInteger;
+
+  if not dbeCodigoProduto.Focused then
+    dbeCodigoProduto.SetFocus;
+end;
+
+procedure TfrmCadastroVendasItens.dbeAcrescimoChange(Sender: TObject);
+begin
+var valor: real;
+begin
+  if not (ibqCadastro.State in [dsInsert, dsEdit]) then
+    exit;
+
+  valor := ibqCadastro.FieldByName('PRECO_UNITARIO').AsFloat * ibqCadastro.FieldByName('QUANTIDADE').AsFloat;
+
+  ibqCadastro.FieldByName('TOTAL_LIQUIDO').AsFloat := valor + CalculaValorDescAcresc(valor, StrToCurrDef(dbeAcrescimo.Text, 0));
+end;
+end;
+
+procedure TfrmCadastroVendasItens.dbeCodigoProdutoChange(Sender: TObject);
+begin
+  if ibqCadastro.State in [dsInsert, dsEdit] then
+    ibqCadastro.UpdateRecord;
+
+  if (ibqCadastro.FieldByName('CODIGO_PRODUTO').AsInteger > 0) then
+  begin
+
+    ibqProduto.Close;
+    ibqProduto.ParamByName('CODIGO_PRODUTO').AsInteger := ibqCadastro.FieldByName('CODIGO_PRODUTO').AsInteger;
+    ibqProduto.Open;
+    if ibqProduto.IsEmpty then
+    begin
+      showMessage('Produto não Cadastrado!');
+      exit;
+    end;
+
+    if ibqCadastro.State in [dsInsert, dsEdit] then
+      ibqCadastro.FieldByName('PRECO_UNITARIO').AsCurrency := ibqProduto.FieldByName('PRECO_VENDA').AsCurrency;
+  end;
+end;
+
+procedure TfrmCadastroVendasItens.dbeDescontoChange(Sender: TObject);
+begin
+var valor: Currency;
+begin
+  if not (ibqCadastro.State in [dsInsert, dsEdit]) then
+    exit;
+
+  valor := ibqCadastro.FieldByName('PRECO_UNITARIO').AsFloat * ibqCadastro.FieldByName('QUANTIDADE').AsFloat;
+
+  ibqCadastro.FieldByName('TOTAL_LIQUIDO').AsFloat := valor - CalculaValorDescAcresc(valor, StrToCurrDef(dbeDesconto.Text, 0));
+end;
+end;
+
+procedure TfrmCadastroVendasItens.dbeQuantidadeExit(Sender: TObject);
+begin
+  if not (ibqCadastro.State in [dsInsert, dsEdit]) then
+    exit;
+
+  if trim(dbeQuantidade.Text) = '' then
+    exit;
+
+  ibqCadastro.FieldByName('TOTAL_LIQUIDO').AsFloat := ibqCadastro.FieldByName('PRECO_UNITARIO').AsFloat *
+  Strtofloat(dbeQuantidade.Text);
+end;
+
+procedure TfrmCadastroVendasItens.FormActivate(Sender: TObject);
+begin
+  ibqCadastro.Close;
+  ibqCadastro.ParamByName('CODIGO_VENDA').AsInteger := frmVendas.ibqVenda.FieldByName('CODIGO').AsInteger;
+  ibqCadastro.Open;
+end;
+
+end.

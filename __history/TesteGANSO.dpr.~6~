@@ -1,0 +1,19 @@
+program TesteGANSO;
+
+uses
+  Vcl.Forms,
+  uMenuPrincipal in 'uMenuPrincipal.pas' {frmMenuPrincipal},
+  uConexao in 'uConexao.pas' {dmConexao: TDataModule},
+  uClientes in 'uClientes.pas' {frmClientes},
+  uProdutos in 'uProdutos.pas' {frmProdutos},
+  uFuncoesCadastro in 'uFuncoesCadastro.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TdmConexao, dmConexao);
+  Application.CreateForm(TfrmMenuPrincipal, frmMenuPrincipal);
+  Application.Run;
+end.

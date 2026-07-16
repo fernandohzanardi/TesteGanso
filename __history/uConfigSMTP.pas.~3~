@@ -1,0 +1,393 @@
+unit uConfigSMTP;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.DBCtrls, Vcl.Mask, Data.DB, IBX.IBCustomDataSet, IBX.IBUpdateSQL, IBX.IBQuery,
+  IBX.IBDatabase, uCadastroPadrao, uEnvioMensagens;
+
+type
+  EValidacaoConfig = class(Exception);
+
+  TValidadorConfigSMTP = class
+  strict private
+    class function TemFormatoEmail(const pTexto: string): Boolean; static;
+  public
+    class procedure Validar(pDataSet: TDataSet); static;
+  end;
+
+  TfrmConfiguracaoSMTP = class(TfrmCadastroPadrao)
+    lHost: TLabel;
+    lPorta: TLabel;
+    lTipoTLS: TLabel;
+    lUsuario: TLabel;
+    lSenha: TLabel;
+    lRemetente: TLabel;
+    lNomeRemetente: TLabel;
+    lTimeoutMs: TLabel;
+    lAssuntoPadrao: TLabel;
+    lMensagemPadrao: TLabel;
+
+    dbeHost: TDBEdit;
+    dbePorta: TDBEdit;
+    dbcUsarTLS: TDBCheckBox;
+    dbcbTipoTLS: TDBComboBox;
+    dbeUsuario: TDBEdit;
+    eSenha: TEdit;
+    dbeRemetente: TDBEdit;
+    dbeNomeRemetente: TDBEdit;
+    dbeTimeoutMs: TDBEdit;
+    dbeAssuntoPadrao: TDBEdit;
+    dbmMensagemPadrao: TDBMemo;
+
+    btnTestarEnvio: TButton;
+
+    ibqCadastroCODIGO: TIntegerField;
+    ibqCadastroHOST: TIBStringField;
+    ibqCadastroPORTA: TIntegerField;
+    ibqCadastroUSAR_TLS: TIBStringField;
+    ibqCadastroTIPO_TLS: TIBStringField;
+    ibqCadastroUSUARIO: TIBStringField;
+    ibqCadastroSENHA: TIBStringField;
+    ibqCadastroREMETENTE: TIBStringField;
+    ibqCadastroNOME_REMETENTE: TIBStringField;
+    ibqCadastroTIMEOUT_MS: TIntegerField;
+    ibqCadastroASSUNTO_PADRAO: TIBStringField;
+    ibqCadastroMENSAGEM_PADRAO: TMemoField;
+    ibqCadastroDATA_HORA_ALTERACAO: TSQLTimeStampField;
+
+    procedure FormActivate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure btnTestarEnvioClick(Sender: TObject);
+    procedure btnGravarClick(Sender: TObject);
+    procedure ibqCadastroBeforePost(DataSet: TDataSet);
+    procedure ibqCadastroAfterScroll(DataSet: TDataSet);
+    procedure eSenhaChange(Sender: TObject);
+  strict private
+    FAtualizandoSenha: Boolean;
+    procedure OcultarBotoesNaoUsados;
+    procedure GarantirRegistroUnico;
+    function ConfigDoRegistro: TConfigSMTP;
+  public
+    class function Carregar: TConfigSMTP;
+  end;
+
+var
+  frmConfiguracaoSMTP: TfrmConfiguracaoSMTP;
+
+implementation
+
+{$R *.dfm}
+
+uses
+  System.RegularExpressions, System.NetEncoding, uConexao;
+
+{ TValidadorConfigSMTP }
+
+class function TValidadorConfigSMTP.TemFormatoEmail(const pTexto: string): Boolean;
+const
+  CRegexEmail = '^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$';
+begin
+  Result := TRegEx.IsMatch(pTexto, CRegexEmail);
+end;
+
+class procedure TValidadorConfigSMTP.Validar(pDataSet: TDataSet);
+var
+  lHost: string;
+  lRemetente: string;
+  lPorta: Integer;
+  lTimeout: Integer;
+  lTipoTLS: string;
+  lUsarTLS: string;
+begin
+  lHost      := Trim(pDataSet.FieldByName('HOST').AsString);
+  lRemetente := Trim(pDataSet.FieldByName('REMETENTE').AsString);
+  lPorta     := pDataSet.FieldByName('PORTA').AsInteger;
+  lTimeout   := pDataSet.FieldByName('TIMEOUT_MS').AsInteger;
+  lTipoTLS   := pDataSet.FieldByName('TIPO_TLS').AsString;
+  lUsarTLS   := pDataSet.FieldByName('USAR_TLS').AsString;
+
+  if lHost = '' then
+    raise EValidacaoConfig.Create('Informe o servidor (Host) SMTP!');
+
+  if (lPorta < 1) or (lPorta > 65535) then
+    raise EValidacaoConfig.Create('Porta invalida. Informe um valor entre 1 e 65535.');
+
+  if lRemetente = '' then
+    raise EValidacaoConfig.Create('Informe o e-mail do remetente!');
+
+  if not TemFormatoEmail(lRemetente) then
+    raise EValidacaoConfig.Create('E-mail do remetente em formato invalido!');
+
+  if (lTimeout < 1000) or (lTimeout > 300000) then
+    raise EValidacaoConfig.Create('Timeout deve estar entre 1000 e 300000 ms.');
+
+  if lUsarTLS = '' then
+    lUsarTLS := 'N';
+  if lTipoTLS = '' then
+    lTipoTLS := 'N';
+
+  if (lUsarTLS <> 'S') and (lUsarTLS <> 'N') then
+    raise EValidacaoConfig.Create('Campo "Usar TLS" invalido.');
+
+  if (lTipoTLS <> 'E') and (lTipoTLS <> 'I') and (lTipoTLS <> 'N') then
+    raise EValidacaoConfig.Create('Tipo TLS invalido. Use E, I ou N.');
+
+  if (lUsarTLS = 'N') and (lTipoTLS <> 'N') then
+    raise EValidacaoConfig.Create('Com "Usar TLS" desligado, Tipo TLS deve ser N.');
+end;
+
+{ TfrmConfiguracaoSMTP }
+
+class function TfrmConfiguracaoSMTP.Carregar: TConfigSMTP;
+var
+  lTransacao: TIBTransaction;
+  lQuery: TIBQuery;
+begin
+  FillChar(Result, SizeOf(Result), 0);
+  Result.Porta := 587;
+  Result.UsarTLS := True;
+  Result.TipoTLS := 'E';
+  Result.TimeoutMs := 30000;
+  Result.AssuntoPadrao := 'Contato GANSO';
+
+  lTransacao := TIBTransaction.Create(nil);
+  lQuery := TIBQuery.Create(nil);
+  try
+    lTransacao.DefaultDatabase := dmConexao.IBDConexao;
+    lTransacao.Params.Text := 'read_committed'#13#10'rec_version'#13#10'nowait';
+    lTransacao.StartTransaction;
+    try
+      lQuery.Database := dmConexao.IBDConexao;
+      lQuery.Transaction := lTransacao;
+      lQuery.SQL.Text :=
+        'SELECT HOST, PORTA, USAR_TLS, TIPO_TLS, USUARIO, SENHA, '  +
+        '       REMETENTE, NOME_REMETENTE, TIMEOUT_MS, '            +
+        '       ASSUNTO_PADRAO, MENSAGEM_PADRAO '                   +
+        'FROM CONFIGURACAO_SMTP WHERE CODIGO = 1';
+      lQuery.Open;
+      if not lQuery.IsEmpty then
+      begin
+        Result.Host          := lQuery.FieldByName('HOST').AsString;
+        Result.Porta         := lQuery.FieldByName('PORTA').AsInteger;
+        Result.UsarTLS       := lQuery.FieldByName('USAR_TLS').AsString = 'S';
+        Result.TipoTLS       := (lQuery.FieldByName('TIPO_TLS').AsString + ' ')[1];
+        Result.Usuario       := lQuery.FieldByName('USUARIO').AsString;
+        Result.Senha         := TNetEncoding.Base64.Decode(
+                                  lQuery.FieldByName('SENHA').AsString);
+        Result.Remetente     := lQuery.FieldByName('REMETENTE').AsString;
+        Result.NomeRemetente := lQuery.FieldByName('NOME_REMETENTE').AsString;
+        Result.TimeoutMs     := lQuery.FieldByName('TIMEOUT_MS').AsInteger;
+        Result.AssuntoPadrao := lQuery.FieldByName('ASSUNTO_PADRAO').AsString;
+        Result.MensagemPadrao := lQuery.FieldByName('MENSAGEM_PADRAO').AsString;
+      end;
+      lQuery.Close;
+      lTransacao.Commit;
+    except
+      if lTransacao.InTransaction then
+        lTransacao.Rollback;
+      raise;
+    end;
+  finally
+    lQuery.Free;
+    lTransacao.Free;
+  end;
+end;
+
+procedure TfrmConfiguracaoSMTP.FormActivate(Sender: TObject);
+begin
+  inherited;
+  try
+    if not ibqCadastro.Active then
+      ibqCadastro.Open;
+    GarantirRegistroUnico;
+    OcultarBotoesNaoUsados;
+  except
+    ShowMessage('Falha ao carregar configuracao de SMTP!');
+  end;
+end;
+
+procedure TfrmConfiguracaoSMTP.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  inherited;
+  frmConfiguracaoSMTP := Nil;
+end;
+
+procedure TfrmConfiguracaoSMTP.OcultarBotoesNaoUsados;
+begin
+  btnPrimeiro.Visible := False;
+  btnAnterior.Visible := False;
+  btnProximo.Visible  := False;
+  btnUltimo.Visible   := False;
+  btnInserir.Visible  := False;
+  btnExcluir.Visible  := False;
+  btnImprimir.Visible := False;
+end;
+
+procedure TfrmConfiguracaoSMTP.GarantirRegistroUnico;
+var
+  lInsert: TIBQuery;
+begin
+  if not ibqCadastro.IsEmpty then
+    Exit;
+
+  if not ibqCadastro.Transaction.InTransaction then
+    ibqCadastro.Transaction.StartTransaction;
+
+  lInsert := TIBQuery.Create(nil);
+  try
+    lInsert.Database := dmConexao.IBDConexao;
+    lInsert.Transaction := ibqCadastro.Transaction;
+    lInsert.SQL.Text :=
+      'INSERT INTO CONFIGURACAO_SMTP ' +
+      '  (CODIGO, HOST, PORTA, USAR_TLS, TIPO_TLS, REMETENTE, ' +
+      '   TIMEOUT_MS, ASSUNTO_PADRAO, DATA_HORA_ALTERACAO) ' +
+      'VALUES ' +
+      '  (1, '''', 587, ''S'', ''E'', '''', ' +
+      '   30000, ''Contato GANSO'', CURRENT_TIMESTAMP)';
+    try
+      lInsert.ExecSQL;
+      ibqCadastro.Transaction.CommitRetaining;
+      ibqCadastro.Close;
+      ibqCadastro.Open;
+    except
+      ibqCadastro.Transaction.RollbackRetaining;
+      ShowMessage('Erro ao inicializar configuracao de SMTP!');
+    end;
+  finally
+    lInsert.Free;
+  end;
+end;
+
+procedure TfrmConfiguracaoSMTP.ibqCadastroAfterScroll(DataSet: TDataSet);
+begin
+  FAtualizandoSenha := True;
+  try
+    if Trim(ibqCadastroSENHA.AsString) = '' then
+      eSenha.Text := ''
+    else
+      try
+        eSenha.Text := TNetEncoding.Base64.Decode(ibqCadastroSENHA.AsString);
+      except
+        eSenha.Text := '';
+      end;
+  finally
+    FAtualizandoSenha := False;
+  end;
+end;
+
+procedure TfrmConfiguracaoSMTP.eSenhaChange(Sender: TObject);
+begin
+  if FAtualizandoSenha then
+    Exit;
+
+  if not (ibqCadastro.State in [dsEdit, dsInsert]) then
+    ibqCadastro.Edit;
+end;
+
+procedure TfrmConfiguracaoSMTP.ibqCadastroBeforePost(DataSet: TDataSet);
+begin
+  try
+    TValidadorConfigSMTP.Validar(DataSet);
+  except
+    on E: EValidacaoConfig do
+    begin
+      ShowMessage(E.Message);
+      SysUtils.Abort;
+    end;
+  end;
+
+  ibqCadastroSENHA.AsString := TNetEncoding.Base64.Encode(eSenha.Text);
+  ibqCadastroDATA_HORA_ALTERACAO.AsDateTime := Now;
+end;
+
+procedure TfrmConfiguracaoSMTP.btnGravarClick(Sender: TObject);
+begin
+  if not ibqCadastro.Transaction.InTransaction then
+    ibqCadastro.Transaction.StartTransaction;
+
+  try
+    ibqCadastro.UpdateRecord;
+
+    if ibqCadastro.State in [dsInsert, dsEdit] then
+      ibqCadastro.Post;
+
+    ibqCadastro.Transaction.CommitRetaining;
+    ibqCadastro.Refresh;
+  except
+    on E: EAbort do
+      ibqCadastro.Transaction.RollbackRetaining;
+    on E: Exception do
+    begin
+      ibqCadastro.Transaction.RollbackRetaining;
+      ShowMessage('Erro ao salvar: ' + E.Message);
+    end;
+  end;
+end;
+
+function TfrmConfiguracaoSMTP.ConfigDoRegistro: TConfigSMTP;
+begin
+  FillChar(Result, SizeOf(Result), 0);
+  Result.Host           := ibqCadastroHOST.AsString;
+  Result.Porta          := ibqCadastroPORTA.AsInteger;
+  Result.UsarTLS        := ibqCadastroUSAR_TLS.AsString = 'S';
+  Result.TipoTLS        := (ibqCadastroTIPO_TLS.AsString + ' ')[1];
+  Result.Usuario        := ibqCadastroUSUARIO.AsString;
+  Result.Senha          := eSenha.Text;
+  Result.Remetente      := ibqCadastroREMETENTE.AsString;
+  Result.NomeRemetente  := ibqCadastroNOME_REMETENTE.AsString;
+  Result.TimeoutMs      := ibqCadastroTIMEOUT_MS.AsInteger;
+  Result.AssuntoPadrao  := ibqCadastroASSUNTO_PADRAO.AsString;
+  Result.MensagemPadrao := ibqCadastroMENSAGEM_PADRAO.AsString;
+end;
+
+procedure TfrmConfiguracaoSMTP.btnTestarEnvioClick(Sender: TObject);
+var
+  lConfig: TConfigSMTP;
+  lEnvio: TEnvioMensagens;
+  lDestino: string;
+  lAssunto: string;
+  lCorpo: string;
+begin
+  if ibqCadastro.State in dsEditModes then
+  begin
+    ShowMessage('Grave a configuracao antes de testar!');
+    Exit;
+  end;
+
+  lDestino := InputBox('Teste de envio',
+    'Enviar mensagem de teste para:', ibqCadastroREMETENTE.AsString);
+  if Trim(lDestino) = '' then
+    Exit;
+
+  lConfig := ConfigDoRegistro;
+  lAssunto := 'Teste de configuracao SMTP - ' +
+              FormatDateTime('dd/mm/yyyy hh:nn', Now);
+  lCorpo := 'Este e um teste de envio realizado a partir do sistema GANSO.' +
+            sLineBreak +
+            'Se voce recebeu este e-mail, o SMTP esta configurado corretamente.';
+
+  lEnvio := TEnvioMensagens.Create(lConfig);
+  try
+    try
+      lEnvio.EnviarEmail(lDestino, 'Destinatario de teste', lAssunto, lCorpo);
+      TRegistroLogEmail.Registrar(0, lDestino, lConfig.Remetente, lAssunto,
+        lCorpo, slSucesso, '', 'TESTE_ENVIO');
+      ShowMessage('Teste enviado com sucesso!');
+    except
+      on E: Exception do
+      begin
+        TRegistroLogEmail.Registrar(0, lDestino, lConfig.Remetente, lAssunto,
+          lCorpo, slFalha, E.ClassName + ': ' + E.Message, 'TESTE_ENVIO');
+        ShowMessage('Falha no teste: ' + E.Message);
+      end;
+    end;
+  finally
+    lEnvio.Free;
+  end;
+end;
+
+end.

@@ -1,0 +1,41 @@
+unit uCadastroVendasItens;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uCadastroPadrao, IBX.IBCustomDataSet,
+  IBX.IBUpdateSQL, Data.DB, IBX.IBQuery, IBX.IBDatabase, Vcl.StdCtrls,
+  Vcl.ExtCtrls, Vcl.Mask, Vcl.DBCtrls;
+
+type
+  TfrmCadastroVendasItens = class(TfrmCadastroPadrao)
+    Label1: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
+    dbeCodigo: TDBEdit;
+    dbeCodigoProduto: TDBEdit;
+    dbeQuantidade: TDBEdit;
+    dbePrecoUnitario: TDBEdit;
+    dbeDesconto: TDBEdit;
+    dbeAcrescimo: TDBEdit;
+    dbeTotalLiquido: TDBEdit;
+    dbeDescricaoProduto: TDBEdit;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmCadastroVendasItens: TfrmCadastroVendasItens;
+
+implementation
+
+{$R *.dfm}
+
+end.

@@ -1,0 +1,246 @@
+object frmMenuPrincipal: TfrmMenuPrincipal
+  Left = 0
+  Top = 0
+  Hint = 'Buscar no menu (Palavra(s) ou 1.1 + Enter)'
+  Caption = 'Menu Principal'
+  ClientHeight = 533
+  ClientWidth = 973
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
+  Font.Style = []
+  FormStyle = fsMDIForm
+  KeyPreview = True
+  Menu = mmPrincipal
+  WindowState = wsMaximized
+  OnActivate = FormActivate
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnMouseMove = FormMouseMove
+  DesignSize = (
+    973
+    533)
+  TextHeight = 15
+  object splBusca: TSplitter
+    Left = 32
+    Top = 0
+    Width = 6
+    Height = 533
+    Beveled = True
+    Color = clBtnShadow
+    MinSize = 150
+    ParentColor = False
+    OnCanResize = splBuscaCanResize
+    OnMoved = splBuscaMoved
+  end
+  object svBusca: TSplitView
+    Left = 0
+    Top = 0
+    Width = 32
+    Height = 533
+    CloseStyle = svcCompact
+    CompactWidth = 32
+    DisplayMode = svmOverlay
+    Opened = False
+    OpenedWidth = 270
+    Placement = svpLeft
+    TabOrder = 0
+    OnClosed = svBuscaClosed
+    OnOpened = svBuscaOpened
+    OnResize = svBuscaResize
+    DesignSize = (
+      32
+      533)
+    object sbHamburguer: TSpeedButton
+      Left = 4
+      Top = 4
+      Width = 24
+      Height = 24
+      Hint = 'Abrir/Fechar Localizar Op'#231#227'o('#245'es) no Menu'
+      Caption = '='
+      ParentShowHint = False
+      ShowHint = True
+      OnClick = sbHamburguerClick
+    end
+    object sbFixar: TSpeedButton
+      Left = 248
+      Top = 4
+      Width = 24
+      Height = 24
+      Hint = 'Fixar painel'
+      AllowAllUp = True
+      GroupIndex = 1
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Segoe MDL2 Assets'
+      Font.Style = []
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      OnClick = sbFixarClick
+    end
+    object lTituloBusca: TLabel
+      Left = 36
+      Top = 9
+      Width = 97
+      Height = 15
+      Caption = 'Localizar no menu'
+    end
+    object eBuscaMenu: TEdit
+      Left = 32
+      Top = 36
+      Width = 240
+      Height = 23
+      Hint = 'Buscar no menu (Palavra(s) ou 1.1 + Enter)'
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 0
+      TextHint = 'Buscar no menu (Palavra(s) ou 1.1 + Enter)'
+      OnChange = eBuscaMenuChange
+      OnKeyDown = eBuscaMenuKeyDown
+      OnKeyPress = eBuscaMenuKeyPress
+    end
+    object lbResultadoBusca: TListBox
+      Left = 32
+      Top = 68
+      Width = 240
+      Height = 453
+      Anchors = [akLeft, akTop, akBottom]
+      ItemHeight = 15
+      TabOrder = 1
+      OnDblClick = lbResultadoBuscaDblClick
+      OnKeyPress = lbResultadoBuscaKeyPress
+    end
+  end
+  object mmPrincipal: TMainMenu
+    Left = 456
+    Top = 216
+    object Arquivos: TMenuItem
+      Caption = 'Arquivos'
+      object aClientes: TMenuItem
+        Caption = 'Clientes'
+        OnClick = aClientesClick
+      end
+      object aProdutos: TMenuItem
+        Caption = 'Produtos'
+        OnClick = aProdutosClick
+      end
+      object aVendas: TMenuItem
+        Caption = 'Vendas'
+        OnClick = aVendasClick
+      end
+      object aFormaPagamento: TMenuItem
+        Caption = 'Formas de Pagamento'
+        OnClick = aFormaPagamentoClick
+      end
+      object aCentroCusto: TMenuItem
+        Caption = 'Centros de Custo'
+        OnClick = aCentroCustoClick
+      end
+      object aContaBancaria: TMenuItem
+        Caption = 'Contas Banc'#225'rias'
+        OnClick = aContaBancariaClick
+      end
+      object aFornecedor: TMenuItem
+        Caption = 'Fornecedores'
+        OnClick = aFornecedorClick
+      end
+      object aConfigSMTP: TMenuItem
+        Caption = 'Configura'#231#227'o de SMTP'
+        OnClick = aConfigSMTPClick
+      end
+      object N1: TMenuItem
+        Caption = '-'
+      end
+      object aSair: TMenuItem
+        Caption = 'Sair'
+        OnClick = aSairClick
+      end
+    end
+    object Movimentao1: TMenuItem
+      Caption = 'Movimenta'#231#227'o'
+      object Venda1: TMenuItem
+        Caption = 'Venda'
+        OnClick = Venda1Click
+      end
+      object Venda2: TMenuItem
+        Caption = '-'
+      end
+      object Compra1: TMenuItem
+        Caption = 'Compra'
+      end
+      object Compra2: TMenuItem
+        Caption = '-'
+      end
+      object Caixa1: TMenuItem
+        Caption = 'Caixa'
+        object aMovimentoCaixa: TMenuItem
+          Caption = 'Movimenta'#231#245'es'
+          OnClick = aMovimentoCaixaClick
+        end
+        object aFechamentoCaixa: TMenuItem
+          Caption = 'Fechamento de Caixa'
+          OnClick = aFechamentoCaixaClick
+        end
+        object aConciliacao: TMenuItem
+          Caption = 'Concilia'#231#227'o Banc'#225'ria'
+          OnClick = aConciliacaoClick
+        end
+        object aFluxoCaixa: TMenuItem
+          Caption = 'Fluxo de Caixa'
+          OnClick = aFluxoCaixaClick
+        end
+      end
+      object Contas1: TMenuItem
+        Caption = 'Contas'
+        object aContasReceber: TMenuItem
+          Caption = 'A Receber'
+          OnClick = aContasReceberClick
+        end
+        object aContasPagar: TMenuItem
+          Caption = 'A Pagar'
+          OnClick = aContasPagarClick
+        end
+      end
+    end
+    object N2: TMenuItem
+      Caption = 'Relat'#243'rios'
+      object Relatrios1: TMenuItem
+        Caption = 'Clientes'
+        object Ativos1: TMenuItem
+          Caption = 'Ativos'
+        end
+        object Ativos2: TMenuItem
+          Caption = 'Inativos'
+        end
+      end
+      object aRelFechamentoCaixa: TMenuItem
+        Caption = 'Fechamento de Caixa'
+        OnClick = aRelFechamentoCaixaClick
+      end
+      object aRelFluxoCaixa: TMenuItem
+        Caption = 'Fluxo de Caixa'
+        OnClick = aRelFluxoCaixaClick
+      end
+      object aRelDespesasCC: TMenuItem
+        Caption = 'Despesas por Centro de Custo'
+        OnClick = aRelDespesasCCClick
+      end
+      object aLogEmail: TMenuItem
+        Caption = 'Log de envio de e-mail'
+        OnClick = aLogEmailClick
+      end
+    end
+    object aAjuda: TMenuItem
+      Caption = 'Ajuda'
+    end
+    object Sair1: TMenuItem
+      Caption = 'Sair'
+      OnClick = Sair1Click
+    end
+  end
+end

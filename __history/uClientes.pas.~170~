@@ -1,0 +1,226 @@
+unit uClientes;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, IBX.IBCustomDataSet,
+  IBX.IBQuery, IBX.IBDatabase, uConexao, Vcl.ExtCtrls, Vcl.StdCtrls,
+  Vcl.DBCtrls, Vcl.Mask, IBX.IBStoredProc, IBX.IBUpdateSQL;
+
+type
+  TfrmClientes = class(TForm)
+    IBTransaction: TIBTransaction;
+    dsCadastro: TDataSource;
+    ibqCadastro: TIBQuery;
+    ibqCadastroCODIGO: TIntegerField;
+    ibqCadastroNOME: TIBStringField;
+    ibqCadastroENDERECO: TIBStringField;
+    ibqCadastroBAIRRO: TIBStringField;
+    ibqCadastroCIDADE: TIBStringField;
+    ibqCadastroTELEFONE: TIBStringField;
+    ibqCadastroOBSERVACAO: TBlobField;
+    ibqCadastroRENDA_MENSAL: TIBBCDField;
+    ibqCadastroLIMITE_CREDITO: TIBBCDField;
+    ibqCadastroTOTAL_COMPRAS: TIBBCDField;
+    pCampos: TPanel;
+    pBotoes: TPanel;
+    btnPrimeiro: TButton;
+    btnAnterior: TButton;
+    btnProximo: TButton;
+    btnUltimo: TButton;
+    btnInserir: TButton;
+    btnEditar: TButton;
+    btnGravar: TButton;
+    btnCancelar: TButton;
+    btnExcluir: TButton;
+    Label1: TLabel;
+    dbeCodigo: TDBEdit;
+    Label2: TLabel;
+    dbeNome: TDBEdit;
+    Label3: TLabel;
+    dbeEndereco: TDBEdit;
+    Label4: TLabel;
+    dbeBairro: TDBEdit;
+    Label5: TLabel;
+    dbeCidade: TDBEdit;
+    Label6: TLabel;
+    dbeTelefone: TDBEdit;
+    Label7: TLabel;
+    Label8: TLabel;
+    dbeRendaMensal: TDBEdit;
+    Label9: TLabel;
+    dbeLimiteCredito: TDBEdit;
+    Label10: TLabel;
+    dbmObservacao: TDBMemo;
+    Button1: TButton;
+    ibqAtualiza: TIBQuery;
+    ibqAtualizaTOTAL_COMPRAS: TIBBCDField;
+    eTotalCompras: TEdit;
+    IBUpdateSQLCadastro: TIBUpdateSQL;
+    procedure btnProximoClick(Sender: TObject);
+    procedure btnAnteriorClick(Sender: TObject);
+    procedure btnUltimoClick(Sender: TObject);
+    procedure btnPrimeiroClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormActivate(Sender: TObject);
+    procedure btnCancelarClick(Sender: TObject);
+    procedure btnInserirClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure ibqCadastroAfterScroll(DataSet: TDataSet);
+    procedure btnGravarClick(Sender: TObject);
+    procedure btnEditarClick(Sender: TObject);
+    procedure btnExcluirClick(Sender: TObject);
+    procedure dsCadastroDataChange(Sender: TObject; Field: TField);
+  private
+    { Private declarations }
+    procedure HabilitaBotoes(Status: Boolean);
+    procedure HabilitaBotoesNav(Status: Boolean);
+  public
+    { Public declarations }
+  end;
+
+var
+  frmClientes: TfrmClientes;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmClientes.btnAnteriorClick(Sender: TObject);
+begin
+  ibqCadastro.Prior;
+end;
+
+procedure TfrmClientes.btnCancelarClick(Sender: TObject);
+begin
+  if (ibqCadastro.State in [dsInsert, dsEdit]) then
+    ibqCadastro.Cancel;
+
+end;
+
+procedure TfrmClientes.btnEditarClick(Sender: TObject);
+begin
+  ibqCadastro.Edit;
+end;
+
+procedure TfrmClientes.btnExcluirClick(Sender: TObject);
+begin
+ if MessageDlg('Confirma Exclusão?',
+    mtConfirmation, [mbYes, mbNo], 0, mbYes) = mrYes then
+   ibqCadastro.Delete;
+end;
+
+procedure TfrmClientes.btnGravarClick(Sender: TObject);
+begin
+  if (ibqCadastro.State in [dsInsert, dsEdit]) then
+    ibqCadastro.Post;
+end;
+
+procedure TfrmClientes.btnInserirClick(Sender: TObject);
+begin
+  ibqCadastro.Append;
+end;
+
+procedure TfrmClientes.btnPrimeiroClick(Sender: TObject);
+begin
+  ibqCadastro.First;
+end;
+
+procedure TfrmClientes.btnProximoClick(Sender: TObject);
+begin
+  ibqCadastro.Next;
+end;
+
+procedure TfrmClientes.btnUltimoClick(Sender: TObject);
+begin
+  ibqCadastro.Last;
+end;
+
+procedure TfrmClientes.Button1Click(Sender: TObject);
+begin
+  ibqAtualiza.Close;
+  ibqAtualiza.ParamByName('CODIGO').AsInteger := ibqCadastro.FieldByName('CODIGO').AsInteger;
+  ibqAtualiza.Open;
+
+  eTotalCompras.Text := FloatToStr(ibqCadastro.FieldByName('TOTAL_COMPRAS').AsFloat);
+end;
+
+procedure TfrmClientes.dsCadastroDataChange(Sender: TObject; Field: TField);
+begin
+  HabilitaBotoes(false);
+  HabilitaBotoesNav(true);
+end;
+
+procedure TfrmClientes.FormActivate(Sender: TObject);
+begin
+  ibqCadastro.Open;
+end;
+
+procedure TfrmClientes.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
+  frmclientes := Nil;
+end;
+
+procedure TfrmClientes.HabilitaBotoesNav(Status: Boolean);
+begin
+  btnPrimeiro.Enabled := Status;
+  btnAnterior.Enabled := Status;
+  btnProximo.Enabled := Status;
+  btnUltimo.Enabled := Status;
+
+  if (ibqCadastro.Bof) then
+  begin
+    btnPrimeiro.Enabled := not Status;
+    btnAnterior.Enabled := not Status;
+  end
+  else if (ibqCadastro.Eof) then
+  begin
+    btnProximo.Enabled := not Status;
+    btnUltimo.Enabled := not Status;
+  end;
+end;
+
+procedure TfrmClientes.HabilitaBotoes(Status: Boolean);
+var editando: boolean;
+begin
+
+  editando := ibqCadastro.State in [dsEdit, dsInsert];
+
+  btnInserir.Enabled :=  editando;
+  btnEditar.Enabled := not editando and (not ibqCadastro.IsEmpty);
+  btnExcluir.Enabled := not editando and (not ibqCadastro.IsEmpty);
+  btnGravar.Enabled := editando;
+  btnCancelar.Enabled := editando;
+
+
+{
+  btnInserir.Enabled :=  Status;
+  btnEditar.Enabled := Status;
+  btnGravar.Enabled := Status;
+  btnCancelar.Enabled := Status;
+  btnExcluir.Enabled := Status;
+
+  if (ibqCadastro.State in [dsEdit, dsInsert]) then
+  begin
+    btnGravar.Enabled := not Status;
+    btnCancelar.Enabled := not Status;
+  end
+  else if (ibqCadastro.State in [dsBrowse]) then
+  begin
+    btnInserir.Enabled := not Status;
+    btnEditar.Enabled := not Status;
+    btnexcluir.Enabled := not Status;
+  end;
+  }
+ end;
+
+
+procedure TfrmClientes.ibqCadastroAfterScroll(DataSet: TDataSet);
+begin
+  eTotalCompras.Text := FloatToStr(DataSet.FieldByName('TOTAL_COMPRAS').AsFloat);
+end;
+
+
+end.
