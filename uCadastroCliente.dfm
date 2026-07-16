@@ -1,0 +1,732 @@
+inherited frmCadastroClientes: TfrmCadastroClientes
+  Caption = 'Cadastro de Cliente'
+  ClientHeight = 408
+  ClientWidth = 575
+  OnActivate = FormActivate
+  ExplicitWidth = 591
+  ExplicitHeight = 447
+  PixelsPerInch = 96
+  TextHeight = 15
+  inherited pCampos: TPanel
+    Width = 575
+    Height = 362
+    ExplicitWidth = 575
+    ExplicitHeight = 362
+    object lCodigo: TLabel
+      Left = 42
+      Top = 18
+      Width = 45
+      Height = 15
+      Caption = 'C'#243'digo :'
+      FocusControl = dbeCodigo
+    end
+    object lNome: TLabel
+      Left = 48
+      Top = 46
+      Width = 39
+      Height = 15
+      Caption = 'Nome :'
+      FocusControl = dbeNome
+    end
+    object lEndereco: TLabel
+      Left = 32
+      Top = 75
+      Width = 55
+      Height = 15
+      Caption = 'Endere'#231'o :'
+      FocusControl = dbeEndereco
+    end
+    object lBairro: TLabel
+      Left = 50
+      Top = 104
+      Width = 37
+      Height = 15
+      Caption = 'Bairro :'
+      FocusControl = dbeBairro
+    end
+    object lCidade: TLabel
+      Left = 44
+      Top = 133
+      Width = 43
+      Height = 15
+      Caption = 'Cidade :'
+      FocusControl = dbeCidade
+    end
+    object lTelefone: TLabel
+      Left = 36
+      Top = 163
+      Width = 51
+      Height = 15
+      Caption = 'Telefone :'
+      FocusControl = dbeTelefone
+    end
+    object lObservacao: TLabel
+      Left = 19
+      Top = 195
+      Width = 68
+      Height = 15
+      Caption = 'Observa'#231#227'o :'
+    end
+    object lRendaMensal: TLabel
+      Left = 7
+      Top = 298
+      Width = 80
+      Height = 15
+      Caption = 'Renda Mensal :'
+      FocusControl = dbeRendaMensal
+    end
+    object lLimiteCredito: TLabel
+      Left = 236
+      Top = 299
+      Width = 97
+      Height = 15
+      Caption = 'Limite de Cr'#233'dito :'
+      FocusControl = dbeLimiteCredito
+    end
+    object lTotalCompras: TLabel
+      Left = 234
+      Top = 327
+      Width = 99
+      Height = 15
+      Caption = 'Total de Compras :'
+    end
+    object lEmail: TLabel
+      Left = 285
+      Top = 163
+      Width = 40
+      Height = 15
+      Caption = 'E-mail :'
+      FocusControl = dbeEmail
+    end
+    object dbeCodigo: TDBEdit
+      Left = 93
+      Top = 15
+      Width = 93
+      Height = 23
+      Color = clBtnFace
+      DataField = 'CODIGO'
+      DataSource = dsCadastro
+      Enabled = False
+      TabOrder = 0
+    end
+    object dbeNome: TDBEdit
+      Left = 93
+      Top = 43
+      Width = 442
+      Height = 23
+      DataField = 'NOME'
+      DataSource = dsCadastro
+      TabOrder = 1
+    end
+    object dbeEndereco: TDBEdit
+      Left = 93
+      Top = 72
+      Width = 442
+      Height = 23
+      DataField = 'ENDERECO'
+      DataSource = dsCadastro
+      TabOrder = 2
+    end
+    object dbeBairro: TDBEdit
+      Left = 93
+      Top = 101
+      Width = 300
+      Height = 23
+      DataField = 'BAIRRO'
+      DataSource = dsCadastro
+      TabOrder = 3
+    end
+    object dbeCidade: TDBEdit
+      Left = 93
+      Top = 130
+      Width = 300
+      Height = 23
+      DataField = 'CIDADE'
+      DataSource = dsCadastro
+      TabOrder = 4
+    end
+    object dbeTelefone: TDBEdit
+      Left = 93
+      Top = 159
+      Width = 177
+      Height = 23
+      DataField = 'TELEFONE'
+      DataSource = dsCadastro
+      MaxLength = 14
+      TabOrder = 5
+    end
+    object dbeRendaMensal: TDBEdit
+      Left = 93
+      Top = 295
+      Width = 130
+      Height = 23
+      DataField = 'RENDA_MENSAL'
+      DataSource = dsCadastro
+      MaxLength = 16
+      TabOrder = 7
+    end
+    object dbeLimiteCredito: TDBEdit
+      Left = 339
+      Top = 295
+      Width = 130
+      Height = 23
+      Color = clBtnFace
+      DataField = 'LIMITE_CREDITO'
+      DataSource = dsCadastro
+      Enabled = False
+      TabOrder = 8
+    end
+    object dbmObservacao: TDBMemo
+      Left = 93
+      Top = 187
+      Width = 442
+      Height = 103
+      DataField = 'OBSERVACAO'
+      DataSource = dsCadastro
+      TabOrder = 6
+    end
+    object dbeTotalCompras: TDBEdit
+      Left = 339
+      Top = 324
+      Width = 130
+      Height = 23
+      Color = clBtnFace
+      DataField = 'TOTAL_COMPRAS'
+      DataSource = dsCadastro
+      Enabled = False
+      TabOrder = 9
+    end
+    object dbcSituacao: TDBCheckBox
+      Left = 20
+      Top = 327
+      Width = 100
+      Height = 17
+      Caption = 'Ativo'
+      DataField = 'SITUACAO'
+      DataSource = dsCadastro
+      TabOrder = 10
+      ValueChecked = 'A'
+      ValueUnchecked = 'I'
+    end
+    object dbeEmail: TDBEdit
+      Left = 336
+      Top = 159
+      Width = 199
+      Height = 23
+      DataField = 'EMAIL'
+      DataSource = dsCadastro
+      TabOrder = 11
+    end
+    object btnEnviarEmail: TButton
+      Left = 370
+      Top = 13
+      Width = 90
+      Height = 25
+      Anchors = [akTop, akRight]
+      Caption = 'Enviar E-mail'
+      TabOrder = 12
+      OnClick = btnEnviarEmailClick
+      ExplicitLeft = 428
+    end
+    object btnEnviarWhats: TButton
+      Left = 462
+      Top = 13
+      Width = 104
+      Height = 25
+      Anchors = [akTop, akRight]
+      Caption = 'Enviar WhatsApp'
+      TabOrder = 13
+      OnClick = btnEnviarWhatsClick
+      ExplicitLeft = 520
+    end
+  end
+  inherited pBotoes: TPanel
+    Top = 362
+    Width = 575
+    ExplicitTop = 362
+    ExplicitWidth = 632
+    inherited btnInserir: TButton
+      Left = 132
+      ExplicitLeft = 189
+    end
+    inherited btnEditar: TButton
+      Left = 204
+      ExplicitLeft = 261
+    end
+    inherited btnGravar: TButton
+      Left = 275
+      ExplicitLeft = 332
+    end
+    inherited btnCancelar: TButton
+      Left = 346
+      ExplicitLeft = 403
+    end
+    inherited btnExcluir: TButton
+      Left = 417
+      ExplicitLeft = 474
+    end
+    inherited btnImprimir: TButton
+      Left = 488
+      Caption = 'Imprimir'
+      ExplicitLeft = 545
+    end
+  end
+  object bAtualizar: TButton [2]
+    Left = 475
+    Top = 323
+    Width = 60
+    Height = 25
+    Caption = 'Atualizar'
+    TabOrder = 2
+    OnClick = bAtualizarClick
+  end
+  inherited dsCadastro: TDataSource
+    Left = 320
+    Top = 96
+  end
+  inherited IBTransaction: TIBTransaction
+    Active = True
+    Left = 376
+    Top = 88
+  end
+  inherited ibqCadastro: TIBQuery
+    Active = True
+    SQL.Strings = (
+      'SELECT C.*'
+      'FROM CLIENTE C'
+      'WHERE C.CODIGO > 0')
+    GeneratorField.Field = 'CODIGO'
+    GeneratorField.Generator = 'GEN_CLIENTE_ID'
+    GeneratorField.ApplyEvent = gamOnServer
+    Left = 440
+    Top = 88
+    object ibqCadastroCODIGO: TIntegerField
+      FieldName = 'CODIGO'
+      Origin = 'CLIENTE.CODIGO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object ibqCadastroNOME: TIBStringField
+      FieldName = 'NOME'
+      Origin = 'CLIENTE.NOME'
+      Required = True
+      Size = 60
+    end
+    object ibqCadastroENDERECO: TIBStringField
+      FieldName = 'ENDERECO'
+      Origin = 'CLIENTE.ENDERECO'
+      Size = 60
+    end
+    object ibqCadastroBAIRRO: TIBStringField
+      FieldName = 'BAIRRO'
+      Origin = 'CLIENTE.BAIRRO'
+      Size = 30
+    end
+    object ibqCadastroCIDADE: TIBStringField
+      FieldName = 'CIDADE'
+      Origin = 'CLIENTE.CIDADE'
+      Size = 30
+    end
+    object ibqCadastroTELEFONE: TIBStringField
+      FieldName = 'TELEFONE'
+      Origin = 'CLIENTE.TELEFONE'
+      EditMask = '!\(99\)00000-0000;0;_'
+      Size = 16
+    end
+    object ibqCadastroOBSERVACAO: TBlobField
+      FieldName = 'OBSERVACAO'
+      Origin = 'CLIENTE.OBSERVACAO'
+      ProviderFlags = [pfInUpdate]
+      Size = 8
+    end
+    object ibqCadastroRENDA_MENSAL: TIBBCDField
+      FieldName = 'RENDA_MENSAL'
+      Origin = 'CLIENTE.RENDA_MENSAL'
+      currency = True
+      Precision = 18
+      Size = 2
+    end
+    object ibqCadastroLIMITE_CREDITO: TIBBCDField
+      FieldName = 'LIMITE_CREDITO'
+      Origin = 'CLIENTE.LIMITE_CREDITO'
+      currency = True
+      Precision = 18
+      Size = 2
+    end
+    object ibqCadastroTOTAL_COMPRAS: TIBBCDField
+      FieldName = 'TOTAL_COMPRAS'
+      Origin = 'CLIENTE.TOTAL_COMPRAS'
+      currency = True
+      Precision = 18
+      Size = 2
+    end
+    object ibqCadastroSITUACAO: TIBStringField
+      FieldName = 'SITUACAO'
+      Origin = 'CLIENTE.SITUACAO'
+      FixedChar = True
+      Size = 1
+    end
+    object ibqCadastroEMAIL: TIBStringField
+      FieldName = 'EMAIL'
+      Origin = 'CLIENTE.EMAIL'
+      Size = 100
+    end
+  end
+  inherited IBUpdateSQLCadastro: TIBUpdateSQL
+    RefreshSQL.Strings = (
+      'Select '
+      '  CODIGO,'
+      '  NOME,'
+      '  ENDERECO,'
+      '  BAIRRO,'
+      '  CIDADE,'
+      '  TELEFONE,'
+      '  OBSERVACAO,'
+      '  RENDA_MENSAL,'
+      '  LIMITE_CREDITO,'
+      '  TOTAL_COMPRAS,'
+      '  SITUACAO,'
+      '  EMAIL'
+      'from CLIENTE '
+      'where'
+      '  CODIGO = :CODIGO')
+    ModifySQL.Strings = (
+      'update CLIENTE'
+      'set'
+      '  NOME = :NOME,'
+      '  ENDERECO = :ENDERECO,'
+      '  BAIRRO = :BAIRRO,'
+      '  CIDADE = :CIDADE,'
+      '  TELEFONE = :TELEFONE,'
+      '  OBSERVACAO = :OBSERVACAO,'
+      '  RENDA_MENSAL = :RENDA_MENSAL,'
+      '  LIMITE_CREDITO = :LIMITE_CREDITO,'
+      '  TOTAL_COMPRAS = :TOTAL_COMPRAS,'
+      '  SITUACAO = :SITUACAO,'
+      '  EMAIL = :EMAIL'
+      'where'
+      '  CODIGO = :OLD_CODIGO')
+    InsertSQL.Strings = (
+      'insert into CLIENTE'
+      
+        '  (NOME, ENDERECO, BAIRRO, CIDADE, TELEFONE, OBSERVACAO, RENDA_M' +
+        'ENSAL, '
+      '   LIMITE_CREDITO, TOTAL_COMPRAS, SITUACAO, EMAIL)'
+      'values'
+      
+        '  (:NOME, :ENDERECO, :BAIRRO, :CIDADE, :TELEFONE, :OBSERVACAO, :' +
+        'RENDA_MENSAL, '
+      '   :LIMITE_CREDITO, :TOTAL_COMPRAS, :SITUACAO, :EMAIL)')
+    DeleteSQL.Strings = (
+      'delete from CLIENTE'
+      'where'
+      '  CODIGO = :OLD_CODIGO')
+    Left = 512
+    Top = 112
+  end
+  object ibqAtualiza: TIBQuery
+    Database = dmConexao.IBDConexao
+    BufferChunks = 1000
+    CachedUpdates = False
+    ParamCheck = True
+    SQL.Strings = (
+      'select * from SP_ATUALIZAR_TT_COMPRAS(:CODIGO)')
+    PrecommittedReads = False
+    Left = 488
+    Top = 216
+    ParamData = <
+      item
+        DataType = ftUnknown
+        Name = 'CODIGO'
+        ParamType = ptUnknown
+      end>
+    object ibqAtualizaTOTAL_COMPRAS: TIBBCDField
+      FieldName = 'TOTAL_COMPRAS'
+      Origin = 'SP_ATUALIZAR_TT_COMPRAS.TOTAL_COMPRAS'
+      currency = True
+      Precision = 18
+      Size = 2
+    end
+  end
+  object frxRelatorio: TfrxReport
+    Version = '2023.1.3'
+    DotMatrixReport = False
+    IniFile = '\Software\Fast Reports'
+    PreviewOptions.Buttons = [pbPrint, pbLoad, pbSave, pbExport, pbZoom, pbFind, pbOutline, pbPageSetup, pbTools, pbEdit, pbNavigator, pbExportQuick, pbCopy, pbSelection]
+    PreviewOptions.Zoom = 1.000000000000000000
+    PrintOptions.Printer = 'Default'
+    PrintOptions.PrintOnSheet = 0
+    ReportOptions.CreateDate = 46211.615798032400000000
+    ReportOptions.LastChange = 46211.634646747680000000
+    ScriptLanguage = 'PascalScript'
+    ScriptText.Strings = (
+      'begin'
+      ''
+      'end.')
+    Left = 576
+    Top = 144
+    Datasets = <
+      item
+        DataSet = frxCadastro
+        DataSetName = 'frxCadastro'
+      end>
+    Variables = <>
+    Style = <>
+    object Data: TfrxDataPage
+      Height = 1000.000000000000000000
+      Width = 1000.000000000000000000
+    end
+    object Page1: TfrxReportPage
+      PaperWidth = 210.000000000000000000
+      PaperHeight = 297.000000000000000000
+      PaperSize = 9
+      LeftMargin = 10.000000000000000000
+      RightMargin = 10.000000000000000000
+      TopMargin = 10.000000000000000000
+      BottomMargin = 10.000000000000000000
+      Frame.Typ = [ftLeft, ftRight, ftTop, ftBottom]
+      MirrorMode = []
+      object ReportTitle1: TfrxReportTitle
+        FillType = ftBrush
+        FillGap.Top = 0
+        FillGap.Left = 0
+        FillGap.Bottom = 0
+        FillGap.Right = 0
+        Frame.Typ = []
+        Height = 56.692951200000000000
+        Top = 18.897650000000000000
+        Width = 718.110700000000000000
+        object MemoDate: TfrxMemoView
+          IndexTag = 1
+          AllowVectorExport = True
+          Left = 551.811380000000000000
+          Width = 79.370130000000000000
+          Height = 18.897650000000000000
+          Frame.Typ = []
+          Memo.UTF8W = (
+            '[Date]')
+        end
+        object Memo1: TfrxMemoView
+          AllowVectorExport = True
+          Left = 275.905693260000000000
+          Top = 15.118119530000000000
+          Width = 132.283550730000000000
+          Height = 18.897651670000000000
+          Frame.Typ = []
+          Memo.UTF8W = (
+            'Listagem de Clientes')
+        end
+        object MemoTime: TfrxMemoView
+          IndexTag = 1
+          AllowVectorExport = True
+          Left = 634.961040000000000000
+          Width = 79.370130000000000000
+          Height = 18.897650000000000000
+          Frame.Typ = []
+          Memo.UTF8W = (
+            '[Time]')
+        end
+      end
+      object PageFooter1: TfrxPageFooter
+        FillType = ftBrush
+        FillGap.Top = 0
+        FillGap.Left = 0
+        FillGap.Bottom = 0
+        FillGap.Right = 0
+        Frame.Typ = []
+        Height = 22.677180000000000000
+        Top = 260.787570000000000000
+        Width = 718.110700000000000000
+        object MemoPage: TfrxMemoView
+          IndexTag = 1
+          AllowVectorExport = True
+          Left = 665.197280000000000000
+          Width = 49.133890000000000000
+          Height = 18.897650000000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Arial'
+          Font.Style = []
+          Frame.Typ = []
+          Memo.UTF8W = (
+            '[Page]')
+          ParentFont = False
+        end
+      end
+      object MasterData1: TfrxMasterData
+        FillType = ftBrush
+        FillGap.Top = 0
+        FillGap.Left = 0
+        FillGap.Bottom = 0
+        FillGap.Right = 0
+        Frame.Typ = []
+        Height = 20.456710000000000000
+        Top = 181.417440000000000000
+        Width = 718.110700000000000000
+        DataSet = frxCadastro
+        DataSetName = 'frxCadastro'
+        RowCount = 0
+        object MemofrxCadastroCODIGO: TfrxMemoView
+          IndexTag = 1
+          Align = baWidth
+          AllowVectorExport = True
+          Top = 0.559060000000000000
+          Width = 79.370130000000000000
+          Height = 18.897650000000000000
+          DataField = 'CODIGO'
+          DataSet = frxCadastro
+          DataSetName = 'frxCadastro'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Arial'
+          Font.Style = []
+          Frame.Typ = []
+          Memo.UTF8W = (
+            '[frxCadastro."CODIGO"]')
+          ParentFont = False
+        end
+        object MemofrxCadastroNOME: TfrxMemoView
+          IndexTag = 1
+          Align = baWidth
+          AllowVectorExport = True
+          Left = 79.370130000000000000
+          Top = 0.559060000000000000
+          Width = 400.630180000000000000
+          Height = 18.897650000000000000
+          DataField = 'NOME'
+          DataSet = frxCadastro
+          DataSetName = 'frxCadastro'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Arial'
+          Font.Style = []
+          Frame.Typ = []
+          Memo.UTF8W = (
+            '[frxCadastro."NOME"]')
+          ParentFont = False
+        end
+        object MemofrxCadastroTELEFONE: TfrxMemoView
+          IndexTag = 1
+          Align = baWidth
+          AllowVectorExport = True
+          Left = 480.000310000000000000
+          Top = 0.559060000000000000
+          Width = 238.110407773437500000
+          Height = 18.897650000000000000
+          DataField = 'TELEFONE'
+          DataSet = frxCadastro
+          DataSetName = 'frxCadastro'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Arial'
+          Font.Style = []
+          Frame.Typ = []
+          Memo.UTF8W = (
+            '[frxCadastro."TELEFONE"]')
+          ParentFont = False
+        end
+      end
+      object PageHeader1: TfrxPageHeader
+        FillType = ftBrush
+        FillGap.Top = 0
+        FillGap.Left = 0
+        FillGap.Bottom = 0
+        FillGap.Right = 0
+        Frame.Typ = []
+        Height = 22.677180000000000000
+        Top = 98.267780000000000000
+        Width = 718.110700000000000000
+        object Memo2: TfrxMemoView
+          AllowVectorExport = True
+          Left = -0.000000330000000000
+          Top = 0.000003259999999998
+          Width = 75.590603590000000000
+          Height = 18.897644040000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Arial'
+          Font.Style = []
+          Frame.Typ = []
+          Memo.UTF8W = (
+            'C'#243'digo')
+          ParentFont = False
+        end
+        object Memo3: TfrxMemoView
+          AllowVectorExport = True
+          Left = 79.370129880000000000
+          Top = 0.000003259999999998
+          Width = 94.488243100000000000
+          Height = 18.897644040000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Arial'
+          Font.Style = []
+          Frame.Typ = []
+          Memo.UTF8W = (
+            'Nome')
+          ParentFont = False
+        end
+        object Memo4: TfrxMemoView
+          AllowVectorExport = True
+          Left = 483.779846190000000000
+          Top = 0.000003259999999998
+          Width = 94.488220210000000000
+          Height = 18.897644040000000000
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Arial'
+          Font.Style = []
+          Frame.Typ = []
+          Memo.UTF8W = (
+            'Telefone')
+          ParentFont = False
+        end
+      end
+    end
+  end
+  object frxCadastro: TfrxDBDataset
+    UserName = 'frxCadastro'
+    CloseDataSource = False
+    DataSet = ibqCadastro
+    BCDToCurrency = False
+    DataSetOptions = []
+    Left = 576
+    Top = 208
+  end
+  object frxPDFExport1: TfrxPDFExport
+    UseFileCache = True
+    ShowProgress = True
+    OverwritePrompt = False
+    DataOnly = False
+    EmbedFontsIfProtected = False
+    InteractiveFormsFontSubset = 'A-Z,a-z,0-9,#43-#47 '
+    OpenAfterExport = False
+    PrintOptimized = False
+    Outline = False
+    Background = False
+    HTMLTags = True
+    Quality = 95
+    Author = 'FastReport'
+    Subject = 'FastReport PDF export'
+    Creator = 'FastReport'
+    ProtectionFlags = [ePrint, eModify, eCopy, eAnnot]
+    HideToolbar = False
+    HideMenubar = False
+    HideWindowUI = False
+    FitWindow = False
+    CenterWindow = False
+    PrintScaling = False
+    PdfA = False
+    PDFStandard = psNone
+    PDFVersion = pv17
+    Left = 576
+    Top = 280
+  end
+end
