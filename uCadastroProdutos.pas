@@ -99,10 +99,12 @@ end;
 procedure TfrmCadastroProdutos.AtualizaPercLucro;
 begin
 // Retirado Validação
-
+  if ePercLucro.Text <> '' then
+  begin
   ePercLucro.Text := FormatFloat('0.00',
     TUcalculaFuncFinan.CalculaPercLucro(ibqCadastroVALOR_CUSTO.AsCurrency,
       ibqCadastroPRECO_VENDA.AsCurrency)) + ' %';
+  end;
 end;
 
 procedure TfrmCadastroProdutos.dsCadastroDataChange(Sender: TObject;
