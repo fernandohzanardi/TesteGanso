@@ -1,4 +1,4 @@
-unit uCadastroProdutos;
+﻿unit uCadastroProdutos;
 
 interface
 
@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uCadastroPadrao, IBX.IBCustomDataSet,
   IBX.IBUpdateSQL, Data.DB, IBX.IBQuery, IBX.IBDatabase, Vcl.StdCtrls,
-  Vcl.ExtCtrls, Vcl.Mask, Vcl.DBCtrls, uCalculaFuncoesFinanceiras;
+  Vcl.ExtCtrls, Vcl.Mask, Vcl.DBCtrls, uCalculaFuncoesFinanceiras,
+  frxClass, frxDBSet;
 
 type
   TfrmCadastroProdutos = class(TfrmCadastroPadrao)
@@ -66,7 +67,7 @@ begin
   try
     ibqCadastro.Open;
   except
-    ShowMessage('Conex�o falhou!');
+    ShowMessage('Conexão falhou!');
   end;
 end;
 
@@ -96,22 +97,29 @@ begin
 end;
 
 procedure TfrmCadastroProdutos.AtualizaPercLucro;
+var Valor: Extended;
 begin
+// Retirado Validação
+  Valor := 0.00;
   ePercLucro.Text := FormatFloat('0.00',
-    TUcalculaFuncFinan.CalculaPercLucro(StrToCurrDef(dbeValorCusto.Text, 0),
-      StrToCurrDef(dbePrecoVenda.Text, 0))) + ' %';
+    TUcalculaFuncFinan.CalculaPercLucro(ibqCadastroVALOR_CUSTO.AsCurrency,
+      ibqCadastroPRECO_VENDA.AsCurrency)) + ' %';
+  Valor :=  TUcalculaFuncFinan.CalculaPercLucro(ibqCadastroVALOR_CUSTO.AsCurrency,
+      ibqCadastroPRECO_VENDA.AsCurrency);
+      ShowMessage('Valor é: '+FloattoStr(Valor));
+  //Alterado por Andre 16/07/2026
 end;
 
 procedure TfrmCadastroProdutos.dsCadastroDataChange(Sender: TObject;
   Field: TField);
 begin
   inherited;
-//  AtualizaPercLucro;
+  AtualizaPercLucro;
 end;
 
 procedure TfrmCadastroProdutos.dbeValorCustoChange(Sender: TObject);
 begin
-//  AtualizaPercLucro;
+  AtualizaPercLucro;
 end;
 
 procedure TfrmCadastroProdutos.dbePrecoVendaChange(Sender: TObject);
