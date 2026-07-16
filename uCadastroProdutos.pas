@@ -97,14 +97,25 @@ begin
 end;
 
 procedure TfrmCadastroProdutos.AtualizaPercLucro;
+var Texto: String;
 begin
-// Retirado Validação
-  if ePercLucro.Text <> '' then
-  begin
-  ePercLucro.Text := FormatFloat('0.00',
-    TUcalculaFuncFinan.CalculaPercLucro(ibqCadastroVALOR_CUSTO.AsCurrency,
-      ibqCadastroPRECO_VENDA.AsCurrency)) + ' %';
-  end;
+// Adicionado
+//Validação
+  Texto := '';
+
+  if (Trim(ePercLucro.Text) <> '') then
+    ShowMessage('Vazio!');
+
+  if StrToIntDef(ePercLucro.Text, 0) = 0 then
+    ShowMessage('Zerado!');
+
+//    ePercLucro.Text := FormatFloat('0.00',
+//      TUcalculaFuncFinan.CalculaPercLucro(ibqCadastroVALOR_CUSTO.AsCurrency,
+//      ibqCadastroPRECO_VENDA.AsCurrency)) + ' %';
+
+   ePercLucro.Text := FormatFloat('0.00',
+      ((ibqCadastroPRECO_VENDA.AsCurrency - ibqCadastroVALOR_CUSTO.AsCurrency) / ibqCadastroPRECO_VENDA.AsCurrency) * 100) + ' %';
+
 end;
 
 procedure TfrmCadastroProdutos.dsCadastroDataChange(Sender: TObject;
