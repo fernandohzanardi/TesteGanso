@@ -1,0 +1,335 @@
+unit uInserirAlterarItens;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Data.DB,
+  IBX.IBCustomDataSet, IBX.IBQuery, uConexao, IBX.IBUpdateSQL, IBX.IBDatabase,
+  Vcl.Mask, Vcl.DBCtrls;
+
+type
+  TfrmInserirAlterarItens = class(TForm)
+    pCampos: TPanel;
+    pBotoes: TPanel;
+    btnPrimeiro: TButton;
+    btnAnterior: TButton;
+    btnProximo: TButton;
+    btnUltimo: TButton;
+    btnInserir: TButton;
+    btnEditar: TButton;
+    btnGravar: TButton;
+    btnCancelar: TButton;
+    btnExcluir: TButton;
+    ibqVendaitem: TIBQuery;
+    IBTransactionVendaitem: TIBTransaction;
+    dsVendaitem: TDataSource;
+    IBUpdateSQLVendaitem: TIBUpdateSQL;
+    ibqVendaitemCODIGO: TIntegerField;
+    ibqVendaitemCODIGO_VENDA: TIntegerField;
+    ibqVendaitemCODIGO_PRODUTO: TIntegerField;
+    ibqVendaitemQUANTIDADE: TIBBCDField;
+    ibqVendaitemPRECO_UNITARIO: TIBBCDField;
+    ibqVendaitemDESCONTO: TIBBCDField;
+    ibqVendaitemACRESCIMO: TIBBCDField;
+    ibqVendaitemTOTAL_LIQUIDO: TIBBCDField;
+    lCodigo: TLabel;
+    dbeCodigo: TDBEdit;
+    lCodigoProduto: TLabel;
+    dbeCodigoProduto: TDBEdit;
+    lQuantidade: TLabel;
+    dbeQuantidade: TDBEdit;
+    lPrecoUnitario: TLabel;
+    dbePrecoUnitario: TDBEdit;
+    lDesconto: TLabel;
+    dbeDesconto: TDBEdit;
+    lAcrescimo: TLabel;
+    dbeAcrescimo: TDBEdit;
+    lTotalLiquido: TLabel;
+    dbeTotalLiquido: TDBEdit;
+    dbeDescricaoProduto: TDBEdit;
+    dsProduto: TDataSource;
+    ibqProduto: TIBQuery;
+    procedure dbeCodigoProdutoChange(Sender: TObject);
+    procedure btnGravarClick(Sender: TObject);
+    procedure btnAnteriorClick(Sender: TObject);
+    procedure btnPrimeiroClick(Sender: TObject);
+    procedure btnProximoClick(Sender: TObject);
+    procedure btnUltimoClick(Sender: TObject);
+    procedure btnInserirClick(Sender: TObject);
+    procedure btnEditarClick(Sender: TObject);
+    procedure btnCancelarClick(Sender: TObject);
+    procedure btnExcluirClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormActivate(Sender: TObject);
+    procedure dbeDescontoChange(Sender: TObject);
+    procedure dbeAcrescimoChange(Sender: TObject);
+    procedure dsVendaitemDataChange(Sender: TObject; Field: TField);
+    procedure dbeQuantidadeExit(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+  private
+    procedure HabilitaBotoes;
+    procedure HabilitaBotoesNav;
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmInserirAlterarItens: TfrmInserirAlterarItens;
+
+implementation
+
+{$R *.dfm}
+
+uses uVendas, uCalculaFuncoesFinanceiras;
+
+procedure TfrmInserirAlterarItens.btnAnteriorClick(Sender: TObject);
+begin
+  try
+    ibqVendaitem.Prior;
+  except
+    ShowMessage('Conexão Falhou!');
+  end;
+end;
+
+procedure TfrmInserirAlterarItens.btnCancelarClick(Sender: TObject);
+begin
+  try
+    if (ibqVendaitem.State in [dsInsert, dsEdit]) then
+      ibqVendaitem.Cancel;
+  except
+    ShowMessage('Conexão Falhou!');
+  end;
+end;
+
+procedure TfrmInserirAlterarItens.btnEditarClick(Sender: TObject);
+begin
+  try
+    ibqVendaitem.Edit;
+  except
+    ShowMessage('Conexão Falhou!');
+  end;
+end;
+
+procedure TfrmInserirAlterarItens.btnExcluirClick(Sender: TObject);
+begin
+  if not (MessageDlg('Confirma Exclusão?',
+     mtConfirmation, [mbYes, mbNo], 0, mbYes) = mrYes) then
+    exit;
+
+  if not ibqVendaitem.Transaction.InTransaction then
+    ibqVendaitem.Transaction.StartTransaction;
+  try
+    ibqVendaitem.Delete;
+
+    ibqVendaitem.Transaction.CommitRetaining;
+  except
+    ibqVendaitem.Transaction.RollbackRetaining;
+    ShowMessage('Erro ao Excluir Item!');
+  end;
+
+  if not (ibqProduto.State in [dsInactive]) then
+    ibqProduto.Close;
+end;
+
+procedure TfrmInserirAlterarItens.btnGravarClick(Sender: TObject);
+begin
+  if (ibqProduto.IsEmpty) then
+  begin
+    showMessage('Produto não Localizado!');
+    exit;
+  end;
+
+  if ((ibqVendaitem.FieldByName('QUANTIDADE').IsNull) or (ibqVendaitem.FieldByName('QUANTIDADE').AsFloat = 0)) then
+  begin
+    showMessage('Quantidade deve ser maior do que 0!');
+    exit;
+  end;
+
+  if not ibqVendaitem.Transaction.InTransaction then
+    ibqVendaitem.Transaction.StartTransaction;
+  try
+    if (ibqVendaitem.State in [dsInsert, dsEdit]) then
+    begin
+      ibqVendaitem.UpdateRecord;
+      ibqVendaitem.Post;
+    end;
+
+    ibqVendaitem.Transaction.CommitRetaining;
+  except
+    ibqVendaitem.Transaction.RollbackRetaining;
+    ShowMessage('Erro ao Salvar Item!');
+  end;
+end;
+
+procedure TfrmInserirAlterarItens.btnInserirClick(Sender: TObject);
+begin
+  try
+    ibqVendaitem.Append;
+  except
+    ShowMessage('Conexão Falhou!');
+  end;
+
+  if not (ibqProduto.State in [dsInactive]) then
+    ibqProduto.Close;
+
+  ibqVendaitem.FieldByName('CODIGO_VENDA').AsInteger := frmVendas.ibqVenda.FieldByName('CODIGO').AsInteger;
+
+  if not dbeCodigoProduto.Focused then
+    dbeCodigoProduto.SetFocus;
+end;
+
+procedure TfrmInserirAlterarItens.btnPrimeiroClick(Sender: TObject);
+begin
+  try
+    ibqVendaitem.First;
+  except
+    ShowMessage('Conexão Falhou!');
+  end;
+end;
+
+procedure TfrmInserirAlterarItens.btnProximoClick(Sender: TObject);
+begin
+  try
+    ibqVendaitem.Next;
+  except
+    ShowMessage('Conexão Falhou!');
+  end;
+end;
+
+procedure TfrmInserirAlterarItens.btnUltimoClick(Sender: TObject);
+begin
+  try
+    ibqVendaitem.Last;
+  except
+    ShowMessage('Conexão Falhou!');
+  end;
+end;
+
+procedure TfrmInserirAlterarItens.dbeAcrescimoChange(Sender: TObject);
+var valor: real;
+begin
+  if not (ibqVendaitem.State in [dsInsert, dsEdit]) then
+    exit;
+
+  valor := ibqVendaitem.FieldByName('PRECO_UNITARIO').AsFloat * ibqVendaitem.FieldByName('QUANTIDADE').AsFloat;
+
+  ibqVendaitem.FieldByName('TOTAL_LIQUIDO').AsFloat := TUcalculaFuncFinan.CalculaTotalLiquidoBruto(valor, StrToCurrDef(dbeDesconto.Text, 0), StrToCurrDef(dbeAcrescimo.Text, 0));
+end;
+
+procedure TfrmInserirAlterarItens.dbeCodigoProdutoChange(Sender: TObject);
+begin
+  if ibqVendaitem.State in [dsInsert, dsEdit] then
+    ibqVendaitem.UpdateRecord;
+
+  if (ibqVendaitem.FieldByName('CODIGO_PRODUTO').AsInteger > 0) then
+  begin
+    try
+      ibqProduto.Close;
+      ibqProduto.ParamByName('CODIGO_PRODUTO').AsInteger := ibqVendaitem.FieldByName('CODIGO_PRODUTO').AsInteger;
+      ibqProduto.Open;
+    except
+      ShowMessage('Conexão falhou!');
+    end;
+
+    if ibqProduto.IsEmpty then
+    begin
+      showMessage('Produto não Cadastrado!');
+      exit;
+    end;
+
+    if ibqVendaitem.State in [dsInsert, dsEdit] then
+      ibqVendaitem.FieldByName('PRECO_UNITARIO').AsCurrency := ibqProduto.FieldByName('PRECO_VENDA').AsCurrency;
+  end;
+end;
+
+procedure TfrmInserirAlterarItens.dbeDescontoChange(Sender: TObject);
+var valor: Currency;
+begin
+  if not (ibqVendaitem.State in [dsInsert, dsEdit]) then
+    exit;
+
+  valor := ibqVendaitem.FieldByName('PRECO_UNITARIO').AsFloat * ibqVendaitem.FieldByName('QUANTIDADE').AsFloat;
+
+  ibqVendaitem.FieldByName('TOTAL_LIQUIDO').AsFloat := TUcalculaFuncFinan.CalculaTotalLiquidoBruto(valor, StrToCurrDef(dbeDesconto.Text, 0), StrToCurrDef(dbeAcrescimo.Text, 0));
+end;
+
+procedure TfrmInserirAlterarItens.dbeQuantidadeExit(Sender: TObject);
+begin
+  if not (ibqVendaitem.State in [dsInsert, dsEdit]) then
+    exit;
+
+  if StrToIntDef(trim(dbeQuantidade.Text), 0) = 0 then
+    exit;
+
+  ibqVendaitem.FieldByName('TOTAL_LIQUIDO').AsFloat := ibqVendaitem.FieldByName('PRECO_UNITARIO').AsFloat *
+  Strtofloat(dbeQuantidade.Text);
+end;
+
+procedure TfrmInserirAlterarItens.dsVendaitemDataChange(Sender: TObject;
+  Field: TField);
+begin
+  HabilitaBotoes;
+  HabilitaBotoesNav;
+end;
+
+procedure TfrmInserirAlterarItens.FormActivate(Sender: TObject);
+begin
+  try
+    ibqVendaitem.Close;
+    ibqVendaitem.ParamByName('CODIGO_VENDA').AsInteger := frmVendas.ibqVenda.FieldByName('CODIGO').AsInteger;
+    ibqVendaitem.Open;
+  except
+    ShowMessage('Conexão falhou!');
+  end;
+end;
+
+procedure TfrmInserirAlterarItens.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  if frmVendas.Showing then
+  begin
+    frmVendas.ibqVenda.Refresh;
+
+    try
+      frmVendas.ibqVendaItem.Close;
+      frmVendas.ibqVendaItem.Open;
+    except
+      ShowMessage('Conexão Falhou!');
+    end;
+  end;
+
+  Action := caFree;
+  frmInserirAlterarItens := Nil;
+end;
+
+procedure TfrmInserirAlterarItens.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  case key of
+    VK_ESCAPE: Close;
+  end;
+end;
+
+procedure TfrmInserirAlterarItens.HabilitaBotoes;
+begin
+  btnInserir.Enabled := not (ibqVendaitem.State in dsEditModes);
+  btnEditar.Enabled := btnInserir.Enabled and (not ibqVendaitem.IsEmpty);
+  btnExcluir.Enabled := btnInserir.Enabled and (not ibqVendaitem.IsEmpty);
+  btnGravar.Enabled := not btnInserir.Enabled;
+  btnCancelar.Enabled := not btnInserir.Enabled;
+
+  pCampos.Enabled := not btnInserir.Enabled;
+ end;
+
+ procedure TfrmInserirAlterarItens.HabilitaBotoesNav;
+begin
+  btnPrimeiro.Enabled := not ibqVendaitem.Bof and (ibqVendaitem.State in [dsBrowse]);
+  btnAnterior.Enabled := not ibqVendaitem.Bof and (ibqVendaitem.State in [dsBrowse]);
+
+  btnProximo.Enabled := not ibqVendaitem.Eof and (ibqVendaitem.State in [dsBrowse]);
+  btnUltimo.Enabled := not ibqVendaitem.Eof and (ibqVendaitem.State in [dsBrowse]);
+end;
+
+end.

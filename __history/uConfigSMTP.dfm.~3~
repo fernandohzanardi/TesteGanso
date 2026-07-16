@@ -1,0 +1,362 @@
+inherited frmConfiguracaoSMTP: TfrmConfiguracaoSMTP
+  Caption = 'Configura'#231#227'o de SMTP'
+  ClientHeight = 470
+  ClientWidth = 620
+  StyleElements = [seFont, seClient, seBorder]
+  OnActivate = FormActivate
+  ExplicitWidth = 636
+  ExplicitHeight = 509
+  TextHeight = 15
+  inherited pCampos: TPanel
+    Width = 620
+    Height = 424
+    StyleElements = [seFont, seClient, seBorder]
+    ExplicitWidth = 620
+    ExplicitHeight = 424
+    object lHost: TLabel
+      Left = 67
+      Top = 18
+      Width = 31
+      Height = 15
+      Alignment = taRightJustify
+      Caption = 'Host :'
+      FocusControl = dbeHost
+    end
+    object lPorta: TLabel
+      Left = 64
+      Top = 47
+      Width = 34
+      Height = 15
+      Alignment = taRightJustify
+      Caption = 'Porta :'
+      FocusControl = dbePorta
+    end
+    object lTipoTLS: TLabel
+      Left = 295
+      Top = 47
+      Width = 52
+      Height = 15
+      Alignment = taRightJustify
+      Caption = 'Tipo TLS :'
+      FocusControl = dbcbTipoTLS
+    end
+    object lUsuario: TLabel
+      Left = 52
+      Top = 76
+      Width = 46
+      Height = 15
+      Alignment = taRightJustify
+      Caption = 'Usu'#225'rio :'
+      FocusControl = dbeUsuario
+    end
+    object lSenha: TLabel
+      Left = 60
+      Top = 105
+      Width = 38
+      Height = 15
+      Alignment = taRightJustify
+      Caption = 'Senha :'
+      FocusControl = eSenha
+    end
+    object lRemetente: TLabel
+      Left = 35
+      Top = 134
+      Width = 63
+      Height = 15
+      Alignment = taRightJustify
+      Caption = 'Remetente :'
+      FocusControl = dbeRemetente
+    end
+    object lNomeRemetente: TLabel
+      Left = 2
+      Top = 163
+      Width = 96
+      Height = 15
+      Alignment = taRightJustify
+      Caption = 'Nome remetente :'
+      FocusControl = dbeNomeRemetente
+    end
+    object lTimeoutMs: TLabel
+      Left = 20
+      Top = 192
+      Width = 78
+      Height = 15
+      Alignment = taRightJustify
+      Caption = 'Timeout (ms) :'
+      FocusControl = dbeTimeoutMs
+    end
+    object lAssuntoPadrao: TLabel
+      Left = 9
+      Top = 221
+      Width = 89
+      Height = 15
+      Alignment = taRightJustify
+      Caption = 'Assunto padr'#227'o :'
+      FocusControl = dbeAssuntoPadrao
+    end
+    object lMensagemPadrao: TLabel
+      Left = -7
+      Top = 253
+      Width = 105
+      Height = 15
+      Alignment = taRightJustify
+      Caption = 'Mensagem padr'#227'o :'
+    end
+    object dbeHost: TDBEdit
+      Left = 104
+      Top = 15
+      Width = 380
+      Height = 23
+      DataField = 'HOST'
+      DataSource = dsCadastro
+      TabOrder = 0
+    end
+    object dbePorta: TDBEdit
+      Left = 104
+      Top = 44
+      Width = 80
+      Height = 23
+      DataField = 'PORTA'
+      DataSource = dsCadastro
+      MaxLength = 5
+      TabOrder = 1
+    end
+    object dbcUsarTLS: TDBCheckBox
+      Left = 195
+      Top = 46
+      Width = 80
+      Height = 17
+      Caption = 'Usar TLS'
+      DataField = 'USAR_TLS'
+      DataSource = dsCadastro
+      TabOrder = 2
+      ValueChecked = 'S'
+      ValueUnchecked = 'N'
+    end
+    object dbcbTipoTLS: TDBComboBox
+      Left = 353
+      Top = 44
+      Width = 131
+      Height = 23
+      Style = csDropDownList
+      DataField = 'TIPO_TLS'
+      DataSource = dsCadastro
+      Items.Strings = (
+        'E'
+        'I'
+        'N')
+      TabOrder = 3
+    end
+    object dbeUsuario: TDBEdit
+      Left = 104
+      Top = 73
+      Width = 380
+      Height = 23
+      DataField = 'USUARIO'
+      DataSource = dsCadastro
+      TabOrder = 4
+    end
+    object eSenha: TEdit
+      Left = 104
+      Top = 102
+      Width = 380
+      Height = 23
+      MaxLength = 200
+      PasswordChar = '*'
+      TabOrder = 5
+      OnChange = eSenhaChange
+    end
+    object dbeRemetente: TDBEdit
+      Left = 104
+      Top = 131
+      Width = 380
+      Height = 23
+      DataField = 'REMETENTE'
+      DataSource = dsCadastro
+      TabOrder = 6
+    end
+    object dbeNomeRemetente: TDBEdit
+      Left = 104
+      Top = 160
+      Width = 380
+      Height = 23
+      DataField = 'NOME_REMETENTE'
+      DataSource = dsCadastro
+      TabOrder = 7
+    end
+    object dbeTimeoutMs: TDBEdit
+      Left = 104
+      Top = 189
+      Width = 120
+      Height = 23
+      DataField = 'TIMEOUT_MS'
+      DataSource = dsCadastro
+      MaxLength = 6
+      TabOrder = 8
+    end
+    object dbeAssuntoPadrao: TDBEdit
+      Left = 104
+      Top = 218
+      Width = 380
+      Height = 23
+      DataField = 'ASSUNTO_PADRAO'
+      DataSource = dsCadastro
+      TabOrder = 9
+    end
+    object dbmMensagemPadrao: TDBMemo
+      Left = 104
+      Top = 250
+      Width = 500
+      Height = 130
+      DataField = 'MENSAGEM_PADRAO'
+      DataSource = dsCadastro
+      ScrollBars = ssVertical
+      TabOrder = 10
+    end
+    object btnTestarEnvio: TButton
+      Left = 490
+      Top = 386
+      Width = 114
+      Height = 30
+      Caption = 'Testar envio'
+      TabOrder = 11
+      OnClick = btnTestarEnvioClick
+    end
+  end
+  inherited pBotoes: TPanel
+    Top = 424
+    Width = 620
+    StyleElements = [seFont, seClient, seBorder]
+    ExplicitTop = 424
+    ExplicitWidth = 620
+  end
+  inherited dsCadastro: TDataSource
+    Left = 368
+    Top = 8
+  end
+  inherited IBTransaction: TIBTransaction
+    Left = 424
+    Top = 16
+  end
+  inherited ibqCadastro: TIBQuery
+    AfterScroll = ibqCadastroAfterScroll
+    BeforePost = ibqCadastroBeforePost
+    SQL.Strings = (
+      'SELECT * FROM CONFIGURACAO_SMTP WHERE CODIGO = 1')
+    Left = 440
+    Top = 88
+    object ibqCadastroCODIGO: TIntegerField
+      FieldName = 'CODIGO'
+      Origin = 'CONFIGURACAO_SMTP.CODIGO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object ibqCadastroHOST: TIBStringField
+      FieldName = 'HOST'
+      Origin = 'CONFIGURACAO_SMTP.HOST'
+      Required = True
+      Size = 100
+    end
+    object ibqCadastroPORTA: TIntegerField
+      FieldName = 'PORTA'
+      Origin = 'CONFIGURACAO_SMTP.PORTA'
+      Required = True
+    end
+    object ibqCadastroUSAR_TLS: TIBStringField
+      FieldName = 'USAR_TLS'
+      Origin = 'CONFIGURACAO_SMTP.USAR_TLS'
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object ibqCadastroTIPO_TLS: TIBStringField
+      FieldName = 'TIPO_TLS'
+      Origin = 'CONFIGURACAO_SMTP.TIPO_TLS'
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object ibqCadastroUSUARIO: TIBStringField
+      FieldName = 'USUARIO'
+      Origin = 'CONFIGURACAO_SMTP.USUARIO'
+      Size = 100
+    end
+    object ibqCadastroSENHA: TIBStringField
+      FieldName = 'SENHA'
+      Origin = 'CONFIGURACAO_SMTP.SENHA'
+      Size = 200
+    end
+    object ibqCadastroREMETENTE: TIBStringField
+      FieldName = 'REMETENTE'
+      Origin = 'CONFIGURACAO_SMTP.REMETENTE'
+      Required = True
+      Size = 100
+    end
+    object ibqCadastroNOME_REMETENTE: TIBStringField
+      FieldName = 'NOME_REMETENTE'
+      Origin = 'CONFIGURACAO_SMTP.NOME_REMETENTE'
+      Size = 100
+    end
+    object ibqCadastroTIMEOUT_MS: TIntegerField
+      FieldName = 'TIMEOUT_MS'
+      Origin = 'CONFIGURACAO_SMTP.TIMEOUT_MS'
+      Required = True
+    end
+    object ibqCadastroASSUNTO_PADRAO: TIBStringField
+      FieldName = 'ASSUNTO_PADRAO'
+      Origin = 'CONFIGURACAO_SMTP.ASSUNTO_PADRAO'
+      Required = True
+      Size = 120
+    end
+    object ibqCadastroMENSAGEM_PADRAO: TMemoField
+      FieldName = 'MENSAGEM_PADRAO'
+      Origin = 'CONFIGURACAO_SMTP.MENSAGEM_PADRAO'
+      BlobType = ftMemo
+      Size = 8
+    end
+    object ibqCadastroDATA_HORA_ALTERACAO: TSQLTimeStampField
+      FieldName = 'DATA_HORA_ALTERACAO'
+      Origin = 'CONFIGURACAO_SMTP.DATA_HORA_ALTERACAO'
+      Required = True
+    end
+  end
+  inherited IBUpdateSQLCadastro: TIBUpdateSQL
+    RefreshSQL.Strings = (
+      'SELECT '
+      '  CODIGO, HOST, PORTA, USAR_TLS, TIPO_TLS, USUARIO, SENHA,'
+      '  REMETENTE, NOME_REMETENTE, TIMEOUT_MS, ASSUNTO_PADRAO,'
+      '  MENSAGEM_PADRAO, DATA_HORA_ALTERACAO'
+      'FROM CONFIGURACAO_SMTP'
+      'WHERE CODIGO = :CODIGO')
+    ModifySQL.Strings = (
+      'UPDATE CONFIGURACAO_SMTP SET'
+      '  HOST = :HOST,'
+      '  PORTA = :PORTA,'
+      '  USAR_TLS = :USAR_TLS,'
+      '  TIPO_TLS = :TIPO_TLS,'
+      '  USUARIO = :USUARIO,'
+      '  SENHA = :SENHA,'
+      '  REMETENTE = :REMETENTE,'
+      '  NOME_REMETENTE = :NOME_REMETENTE,'
+      '  TIMEOUT_MS = :TIMEOUT_MS,'
+      '  ASSUNTO_PADRAO = :ASSUNTO_PADRAO,'
+      '  MENSAGEM_PADRAO = :MENSAGEM_PADRAO,'
+      '  DATA_HORA_ALTERACAO = :DATA_HORA_ALTERACAO'
+      'WHERE CODIGO = :OLD_CODIGO')
+    InsertSQL.Strings = (
+      'INSERT INTO CONFIGURACAO_SMTP'
+      '  (CODIGO, HOST, PORTA, USAR_TLS, TIPO_TLS, USUARIO, SENHA,'
+      '   REMETENTE, NOME_REMETENTE, TIMEOUT_MS, ASSUNTO_PADRAO,'
+      '   MENSAGEM_PADRAO, DATA_HORA_ALTERACAO)'
+      'VALUES'
+      
+        '  (:CODIGO, :HOST, :PORTA, :USAR_TLS, :TIPO_TLS, :USUARIO, :SENH' +
+        'A,'
+      '   :REMETENTE, :NOME_REMETENTE, :TIMEOUT_MS, :ASSUNTO_PADRAO,'
+      '   :MENSAGEM_PADRAO, :DATA_HORA_ALTERACAO)')
+    DeleteSQL.Strings = (
+      'DELETE FROM CONFIGURACAO_SMTP WHERE CODIGO = :OLD_CODIGO')
+    Left = 488
+    Top = 32
+  end
+end

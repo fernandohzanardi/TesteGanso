@@ -1,0 +1,488 @@
+unit uVendas;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.Variants,
+  System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Data.DB,
+  IBX.IBCustomDataSet, IBX.IBQuery, uConexao, IBX.IBDatabase, Vcl.StdCtrls,
+  Vcl.Mask, Vcl.DBCtrls, Vcl.Grids, Vcl.DBGrids, IBX.IBUpdateSQL,
+  uInserirAlterarItens, uCalculaFuncoesFinanceiras,
+  IBX.IBStoredProc, frxSmartMemo, frxClass, frxExportBaseDialog, frxExportPDF,
+  frxDBSet, frCoreClasses;
+
+type
+  TfrmVendas = class(TForm)
+    pCampos: TPanel;
+    pBotoes: TPanel;
+    dsVenda: TDataSource;
+    ibqVenda: TIBQuery;
+    IBTransactionVenda: TIBTransaction;
+    ibqCliente: TIBQuery;
+    dsCliente: TDataSource;
+    gbFechamentoVenda: TGroupBox;
+    lTotalBruto: TLabel;
+    dbeTotalBruto: TDBEdit;
+    lDesconto: TLabel;
+    dbeDesconto: TDBEdit;
+    lAcrescimo: TLabel;
+    dbeAcrescimo: TDBEdit;
+    lTotalLiquido: TLabel;
+    pVenda: TPanel;
+    pCliente: TPanel;
+    lCodigoCliente: TLabel;
+    dbeCodigo: TDBEdit;
+    lCodigoVenda: TLabel;
+    dbeDataHoraVenda: TDBEdit;
+    lDataHoraVenda: TLabel;
+    lSituacao: TLabel;
+    gbVendaItem: TGroupBox;
+    dbgItens: TDBGrid;
+    btnInserirItens: TButton;
+    btnExcluir: TButton;
+    btnCancelar: TButton;
+    btnGravar: TButton;
+    btnEditar: TButton;
+    btnInserir: TButton;
+    btnUltimo: TButton;
+    btnProximo: TButton;
+    btnAnterior: TButton;
+    btnPrimeiro: TButton;
+    btnFecharVenda: TButton;
+    IBUpdateSQLVenda: TIBUpdateSQL;
+    eSituacao: TEdit;
+    dsVendaItem: TDataSource;
+    ibqVendaItem: TIBQuery;
+    ibqVendaItemCODIGO: TIntegerField;
+    ibqVendaItemCODIGO_PRODUTO: TIntegerField;
+    ibqVendaItemDESCRICAO: TIBStringField;
+    ibqVendaItemQUANTIDADE: TIBBCDField;
+    ibqVendaItemPRECO_UNITARIO: TIBBCDField;
+    ibqVendaItemDESCONTO: TIBBCDField;
+    ibqVendaItemACRESCIMO: TIBBCDField;
+    ibqVendaItemTOTAL_LIQUIDO: TIBBCDField;
+    dbeCodigoCliente: TDBEdit;
+    dbeNomeCliente: TDBEdit;
+    ibqClienteCODIGO: TIntegerField;
+    ibqClienteNOME: TIBStringField;
+    ibqClienteLIMITE_CREDITO: TIBBCDField;
+    ibqClienteSITUACAO: TIBStringField;
+    dbeTotalLiquido: TDBEdit;
+    ibqVendaCODIGO: TIntegerField;
+    ibqVendaCODIGO_CLIENTE: TIntegerField;
+    ibqVendaSITUACAO: TIBStringField;
+    ibqVendaDATA_HORA_VENDA: TDateTimeField;
+    ibqVendaTOTAL_BRUTO: TIBBCDField;
+    ibqVendaDESCONTO_PERC: TIBBCDField;
+    ibqVendaACRESCIMO_PREC: TIBBCDField;
+    ibqVendaTOTAL_LIQUIDO: TIBBCDField;
+    frxRelatorio: TfrxReport;
+    frxVenda: TfrxDBDataset;
+    frxPDFExport1: TfrxPDFExport;
+    frxItensVenda: TfrxDBDataset;
+    frxCliente: TfrxDBDataset;
+    btnImprimir: TButton;
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure btnAnteriorClick(Sender: TObject);
+    procedure btnPrimeiroClick(Sender: TObject);
+    procedure btnProximoClick(Sender: TObject);
+    procedure btnUltimoClick(Sender: TObject);
+    procedure btnInserirClick(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure btnGravarClick(Sender: TObject);
+    procedure btnEditarClick(Sender: TObject);
+    procedure btnInserirItensClick(Sender: TObject);
+    procedure dsVendaDataChange(Sender: TObject; Field: TField);
+    procedure btnExcluirClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure dbeDescontoChange(Sender: TObject);
+    procedure dbeAcrescimoChange(Sender: TObject);
+    procedure dbeCodigoClienteChange(Sender: TObject);
+    procedure btnFecharVendaClick(Sender: TObject);
+    procedure btnCancelarClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure dbeDescontoExit(Sender: TObject);
+    procedure dbeAcrescimoExit(Sender: TObject);
+  private
+    procedure HabilitaBotoes;
+    procedure HabilitaBotoesNav;
+    procedure AbreFechaVenda(Status: Char);
+    procedure AplicaDesconto;
+    procedure AplicaAcrescimo;
+    function ClienteAtivo: Boolean;
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmVendas: TfrmVendas;
+
+implementation
+
+uses
+  System.SysUtils;
+
+{$R *.dfm}
+
+procedure TfrmVendas.btnAnteriorClick(Sender: TObject);
+begin
+  try
+    ibqVenda.Prior;
+  except
+    ShowMessage('Conexão Falhou!');
+  end;
+end;
+
+procedure TfrmVendas.btnCancelarClick(Sender: TObject);
+begin
+  try
+    if (ibqVenda.State in [dsInsert, dsEdit]) then
+      ibqVenda.Cancel;
+  except
+    ShowMessage('Conexão Falhou!');
+  end;
+end;
+
+procedure TfrmVendas.btnEditarClick(Sender: TObject);
+begin
+  if not ClienteAtivo then
+  begin
+    ShowMessage('Ops! Esta venda não pode ser editada porque o cliente associado está inativo. Por favor, ative o cadastro dele para prosseguir.');
+    exit;
+  end;
+
+  try
+    ibqVenda.Edit;
+  except
+    ShowMessage('Conexão Falhou!');
+  end;
+end;
+
+procedure TfrmVendas.btnExcluirClick(Sender: TObject);
+begin
+  if (ibqVenda.FieldByName('SITUACAO').AsString = 'F') then
+  begin
+    ShowMessage('Venda com Situação: FECHADA, não pode ser excluída!');
+    exit;
+  end;
+
+  if not ClienteAtivo then
+  begin
+    ShowMessage('Não conseguimos prosseguir com a exclusão porque o cliente associado está inativo. Por favor, verifique o cadastro dele.');
+    exit;
+  end;
+
+  if not MessageDlg('Confirma Exclusão?', mtConfirmation, [mbYes, mbNo], 0,
+    mbYes) = mrYes then
+    exit;
+
+  if (not ibqVenda.Transaction.InTransaction) then
+    ibqVenda.Transaction.StartTransaction;
+
+  try
+    ibqVenda.Delete;
+
+    ibqVenda.Transaction.CommitRetaining;
+  except
+    ibqVenda.Transaction.RollbackRetaining;
+    ShowMessage('Erro ao Excluir!')
+  end;
+end;
+
+procedure TfrmVendas.btnFecharVendaClick(Sender: TObject);
+begin
+  if (not ibqVenda.IsEmpty) then
+  begin
+    if not ClienteAtivo then
+    begin
+      ShowMessage('Esta venda não pode ser aberta ou fechada porque o cliente associado está inativo. Por favor, ative o cadastro dele primeiro.');
+      exit;
+    end;
+
+    if (ibqVenda.FieldByName('SITUACAO').AsString = 'A') then
+      AbreFechaVenda('F')
+    else AbreFechaVenda('A');
+  end;
+end;
+
+procedure TfrmVendas.AbreFechaVenda(Status: Char);
+begin
+  if (not ibqVenda.Transaction.InTransaction) then
+    ibqVenda.Transaction.StartTransaction;
+
+  try
+    ibqVenda.Edit;
+    ibqVenda.FieldByName('SITUACAO').AsString := Status;
+    ibqVenda.Post;
+
+    ibqVenda.Transaction.CommitRetaining;
+  Except
+    ibqVenda.Transaction.RollbackRetaining;
+    ShowMessage('Erro ao Fechar/Abrir a Venda!');
+  end;
+end;
+
+function TfrmVendas.ClienteAtivo: Boolean;
+begin
+  Result := (not ibqCliente.Active) or ibqCliente.IsEmpty
+         or (ibqCliente.FieldByName('SITUACAO').AsString = 'A');
+end;
+
+procedure TfrmVendas.btnGravarClick(Sender: TObject);
+begin
+  if ibqCliente.IsEmpty then
+  begin
+    ShowMessage('Cliente precisa ser informado!');
+    exit;
+  end;
+
+  if not ClienteAtivo then
+  begin
+    ShowMessage('Para que possamos gravar as alterações da venda, o cliente precisa estar ativo. Por favor, verifique a situação dele.');
+    exit;
+  end;
+
+  if not ibqVenda.Transaction.InTransaction then
+    ibqVenda.Transaction.StartTransaction;
+
+  try
+    if (ibqVenda.State in [dsInsert, dsEdit]) then
+    begin
+      ibqVenda.UpdateRecord;
+      ibqVenda.Post;
+    end;
+
+    ibqVenda.Transaction.CommitRetaining;
+    ibqVenda.Refresh;
+  except
+    ibqVenda.Transaction.RollbackRetaining;
+    ShowMessage('Erro ao salvar a venda!');
+  end;
+end;
+
+procedure TfrmVendas.btnInserirClick(Sender: TObject);
+begin
+  try
+    ibqVenda.Append;
+
+    ibqVenda.FieldByName('DATA_HORA_VENDA').AsDateTime := now;
+    ibqVenda.FieldByName('SITUACAO').AsString := 'A';
+
+    if not dbeCodigoCliente.Focused then
+      dbeCodigoCliente.SetFocus;
+
+    if not(ibqCliente.State in [dsInactive]) then
+      ibqCliente.Close;
+  except
+    ShowMessage('Conexão Falhou!');
+  end;
+end;
+
+procedure TfrmVendas.btnInserirItensClick(Sender: TObject);
+begin
+  if ibqVenda.FieldByName('SITUACAO').AsString = 'F' then
+  begin
+    ShowMessage('Venda precisa estar com Situação: ABERTA');
+    Exit;
+  end;
+
+  if not ClienteAtivo then
+  begin
+    ShowMessage('Para alterar os itens desta venda, precisamos que o cadastro do cliente esteja ativo. Por favor, verifique a situação do cliente.');
+    exit;
+  end;
+
+  if ibqCliente.IsEmpty then
+  begin
+    ShowMessage('Cliente não informado na Venda');
+    exit;
+  end;
+
+  if not Assigned(frmInserirAlterarItens) then
+    frmInserirAlterarItens := TfrmInserirAlterarItens.Create(Self);
+
+  frmInserirAlterarItens.ShowModal;
+end;
+
+procedure TfrmVendas.btnPrimeiroClick(Sender: TObject);
+begin
+  try
+    ibqVenda.first;
+  except
+    ShowMessage('Conexão Falhou!');
+  end;
+end;
+
+procedure TfrmVendas.btnProximoClick(Sender: TObject);
+begin
+  try
+    ibqVenda.Next;
+  except
+    ShowMessage('Conexão Falhou!');
+  end;
+end;
+
+procedure TfrmVendas.btnUltimoClick(Sender: TObject);
+begin
+  try
+    ibqVenda.Last;
+  except
+    ShowMessage('Conexão Falhou!');
+  end;
+end;
+
+procedure TfrmVendas.AplicaAcrescimo;
+var
+  valor: Currency;
+begin
+  if not(ibqVenda.State in [dsInsert, dsEdit]) then
+    Exit;
+
+  valor := ibqVenda.FieldByName('TOTAL_BRUTO').AsFloat;
+
+  ibqVenda.FieldByName('TOTAL_LIQUIDO').AsFloat :=
+    TUcalculaFuncFinan.CalculaTotalLiquidoBruto(valor, StrToCurrDef(dbeDesconto.Text, 0), StrToCurrDef(dbeAcrescimo.Text, 0));
+end;
+
+procedure TfrmVendas.dbeAcrescimoChange(Sender: TObject);
+begin
+  AplicaAcrescimo;
+end;
+
+procedure TfrmVendas.dbeAcrescimoExit(Sender: TObject);
+begin
+  AplicaAcrescimo;
+end;
+
+procedure TfrmVendas.dbeCodigoClienteChange(Sender: TObject);
+begin
+  if ibqVenda.State in [dsInsert, dsEdit] then
+    ibqVenda.UpdateRecord;
+
+  if ibqVenda.FieldByName('CODIGO_CLIENTE').AsInteger > 0 then
+  begin
+    try
+      ibqCliente.Close;
+      ibqCliente.ParamByName('CODIGO_CLIENTE').AsInteger :=
+        ibqVenda.FieldByName('CODIGO_CLIENTE').AsInteger;
+      ibqCliente.Open;
+    except
+      ShowMessage('Conexão falhou!');
+    end;
+
+    if ibqCliente.IsEmpty then
+    begin
+      ShowMessage('Cliente não encontrado!');
+      dbeCodigoCliente.Clear;
+      dbeCodigoCliente.SetFocus;
+      exit;
+    end;
+
+    if (ibqVenda.State = dsInsert)
+       and (ibqCliente.FieldByName('SITUACAO').AsString = 'I') then
+    begin
+      ShowMessage('Este cliente está inativo no momento. Para iniciar uma venda para ele, por favor, ative o cadastro dele primeiro.');
+      dbeCodigoCliente.Clear;
+      dbeCodigoCliente.SetFocus;
+      exit;
+    end;
+
+    btnInserirItens.Enabled := True;
+  end;
+end;
+
+procedure TfrmVendas.AplicaDesconto;
+var
+  valor: Currency;
+begin
+  if not (ibqVenda.State in [dsInsert, dsEdit]) then
+    Exit;
+
+  valor := ibqVendaTOTAL_BRUTO.AsFloat;
+
+  ibqVenda.FieldByName('TOTAL_LIQUIDO').AsFloat :=
+    TUcalculaFuncFinan.CalculaTotalLiquidoBruto(valor, StrToCurrDef(dbeDesconto.Text, 0), StrToCurrDef(dbeAcrescimo.Text, 0));
+end;
+
+procedure TfrmVendas.dbeDescontoChange(Sender: TObject);
+begin
+  AplicaDesconto;
+end;
+
+procedure TfrmVendas.dbeDescontoExit(Sender: TObject);
+begin
+  AplicaDesconto;
+end;
+
+procedure TfrmVendas.dsVendaDataChange(Sender: TObject; Field: TField);
+begin
+  HabilitaBotoes;
+  HabilitaBotoesNav;
+
+  eSituacao.Text := 'FECHADA';
+  btnFecharVenda.Caption := 'Inserir/Alterar Itens';
+  gbFechamentoVenda.Enabled := False;
+  if ibqVenda.FieldByName('SITUACAO').AsString = 'A' then
+  begin
+    eSituacao.Text := 'ABERTA';
+    btnFecharVenda.Caption := 'Fechar Venda';
+    gbFechamentoVenda.Enabled := True;
+  end;
+end;
+
+procedure TfrmVendas.FormActivate(Sender: TObject);
+begin
+  try
+    ibqVenda.Open;
+  except
+    ShowMessage('Conexão falhou!');
+  end;
+end;
+
+procedure TfrmVendas.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
+  frmVendas := Nil;
+end;
+
+procedure TfrmVendas.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  case key of
+    VK_ESCAPE: Close;
+  end;
+end;
+
+procedure TfrmVendas.FormShow(Sender: TObject);
+begin
+  try
+    ibqVendaItem.Open;
+  except
+    ShowMessage('Conexão falhou!');
+  end;
+end;
+
+procedure TfrmVendas.HabilitaBotoes;
+begin
+  btnInserir.Enabled := not(ibqVenda.State in dsEditModes);
+  btnEditar.Enabled := btnInserir.Enabled and (not ibqVenda.IsEmpty);
+  btnExcluir.Enabled := btnInserir.Enabled and (not ibqVenda.IsEmpty);
+  btnGravar.Enabled := not btnInserir.Enabled;
+  btnCancelar.Enabled := not btnInserir.Enabled;
+
+  pCampos.Enabled := not btnInserir.Enabled;
+  pCliente.Enabled := pCampos.Enabled;
+end;
+
+procedure TfrmVendas.HabilitaBotoesNav;
+begin
+  btnPrimeiro.Enabled := not ibqVenda.Bof and (ibqVenda.State in [dsBrowse]);
+  btnAnterior.Enabled := btnPrimeiro.Enabled;
+
+  btnProximo.Enabled := not ibqVenda.Eof and (ibqVenda.State in [dsBrowse]);
+  btnUltimo.Enabled := btnProximo.Enabled;
+end;
+
+end.

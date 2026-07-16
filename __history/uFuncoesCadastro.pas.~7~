@@ -1,0 +1,18 @@
+unit uFuncoesCadastro;
+
+interface
+
+
+implementation
+
+ procedure HabilitaBotoes;
+ begin
+
+ end;
+
+ procedure ManutencaoBancoDados(DataSet: TDataSet);
+ begin
+
+ end;
+
+end.

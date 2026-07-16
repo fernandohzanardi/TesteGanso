@@ -1,0 +1,15 @@
+object dmConexao: TdmConexao
+  Height = 480
+  Width = 640
+  object IBDConexao: TIBDatabase
+    Connected = True
+    DatabaseName = 'C:\Ganso\Dados\Ganso.IB'
+    Params.Strings = (
+      'user_name=sysdba'
+      'password=1652498327')
+    LoginPrompt = False
+    ServerType = 'IBServer'
+    Left = 48
+    Top = 40
+  end
+end

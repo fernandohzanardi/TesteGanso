@@ -1,0 +1,133 @@
+object dmRelFichaCliente: TdmRelFichaCliente
+  Height = 273
+  Width = 380
+  object IBTransactionRel: TIBTransaction
+    DefaultDatabase = dmConexao.IBDConexao
+    Params.Strings = (
+      'read_committed'
+      'rec_version'
+      'nowait')
+    Left = 40
+    Top = 24
+  end
+  object ibqCliente: TIBQuery
+    Database = dmConexao.IBDConexao
+    Transaction = IBTransactionRel
+    BufferChunks = 1000
+    CachedUpdates = False
+    ParamCheck = True
+    SQL.Strings = (
+      'SELECT C.CODIGO, C.NOME, C.ENDERECO, C.BAIRRO, C.CIDADE,'
+      '       C.TELEFONE, C.OBSERVACAO, C.RENDA_MENSAL,'
+      '       C.LIMITE_CREDITO, C.TOTAL_COMPRAS, C.SITUACAO'
+      'FROM CLIENTE C'
+      'WHERE C.CODIGO = :CODIGO')
+    PrecommittedReads = False
+    Left = 40
+    Top = 88
+    ParamData = <
+      item
+        DataType = ftInteger
+        Name = 'CODIGO'
+        ParamType = ptInput
+      end>
+    object ibqClienteCODIGO: TIntegerField
+      FieldName = 'CODIGO'
+      Origin = 'CLIENTE.CODIGO'
+      Required = True
+    end
+    object ibqClienteNOME: TIBStringField
+      FieldName = 'NOME'
+      Origin = 'CLIENTE.NOME'
+      Required = True
+      Size = 60
+    end
+    object ibqClienteENDERECO: TIBStringField
+      FieldName = 'ENDERECO'
+      Origin = 'CLIENTE.ENDERECO'
+      Size = 60
+    end
+    object ibqClienteBAIRRO: TIBStringField
+      FieldName = 'BAIRRO'
+      Origin = 'CLIENTE.BAIRRO'
+      Size = 30
+    end
+    object ibqClienteCIDADE: TIBStringField
+      FieldName = 'CIDADE'
+      Origin = 'CLIENTE.CIDADE'
+      Size = 30
+    end
+    object ibqClienteTELEFONE: TIBStringField
+      FieldName = 'TELEFONE'
+      Origin = 'CLIENTE.TELEFONE'
+      Size = 16
+    end
+    object ibqClienteOBSERVACAO: TMemoField
+      FieldName = 'OBSERVACAO'
+      Origin = 'CLIENTE.OBSERVACAO'
+      BlobType = ftMemo
+    end
+    object ibqClienteRENDA_MENSAL: TIBBCDField
+      FieldName = 'RENDA_MENSAL'
+      Origin = 'CLIENTE.RENDA_MENSAL'
+      currency = True
+      Precision = 18
+      Size = 2
+    end
+    object ibqClienteLIMITE_CREDITO: TIBBCDField
+      FieldName = 'LIMITE_CREDITO'
+      Origin = 'CLIENTE.LIMITE_CREDITO'
+      currency = True
+      Precision = 18
+      Size = 2
+    end
+    object ibqClienteTOTAL_COMPRAS: TIBBCDField
+      FieldName = 'TOTAL_COMPRAS'
+      Origin = 'CLIENTE.TOTAL_COMPRAS'
+      currency = True
+      Precision = 18
+      Size = 2
+    end
+    object ibqClienteSITUACAO: TIBStringField
+      FieldName = 'SITUACAO'
+      Origin = 'CLIENTE.SITUACAO'
+      FixedChar = True
+      Size = 1
+    end
+  end
+  object frxCliente: TfrxDBDataset
+    UserName = 'FichaCliente'
+    CloseDataSource = False
+    DataSet = ibqCliente
+    BCDToCurrency = False
+    DataSetOptions = []
+    Left = 168
+    Top = 88
+  end
+  object frxRelatorio: TfrxReport
+    Version = '2026.2.2'
+    DotMatrixReport = False
+    IniFile = '\Software\Fast Reports'
+    PreviewOptions.Buttons = [pbPrint, pbLoad, pbSave, pbExport, pbZoom, pbFind, pbOutline, pbPageSetup, pbTools, pbEdit, pbNavigator, pbExportQuick]
+    PreviewOptions.Zoom = 1.000000000000000000
+    PrintOptions.Printer = 'Default'
+    PrintOptions.PrintOnSheet = 0
+    ReportOptions.CreateDate = 46228.552083333330000000
+    ReportOptions.LastChange = 46228.552083333330000000
+    ScriptLanguage = 'PascalScript'
+    ScriptText.Strings = (
+      'begin'
+      ''
+      'end.')
+    Left = 168
+    Top = 24
+    Datasets = <
+      item
+        DataSet = frxCliente
+        DataSetName = 'FichaCliente'
+      end>
+    Variables = <>
+    Style = <>
+    Watermarks = <>
+  end
+end

@@ -1,0 +1,13 @@
+unit uFuncoesCadastro;
+
+interface
+
+
+implementation
+
+ procedure HabilitaBotoes;
+ begin
+
+ end;
+
+end.

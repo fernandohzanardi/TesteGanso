@@ -1,0 +1,217 @@
+inherited frmCadastroVendasItens: TfrmCadastroVendasItens
+  Caption = 'Cadastro de Venda itens'
+  ClientHeight = 341
+  ClientWidth = 672
+  ExplicitWidth = 688
+  ExplicitHeight = 380
+  PixelsPerInch = 96
+  TextHeight = 15
+  inherited pCampos: TPanel
+    Width = 672
+    Height = 295
+    ExplicitLeft = -88
+    ExplicitTop = 5
+    ExplicitWidth = 793
+    ExplicitHeight = 295
+    object Label1: TLabel
+      Left = 70
+      Top = 24
+      Width = 45
+      Height = 15
+      Caption = 'C'#243'digo :'
+      FocusControl = dbeCodigo
+    end
+    object Label3: TLabel
+      Left = 66
+      Top = 53
+      Width = 49
+      Height = 15
+      Caption = 'Produto :'
+      FocusControl = dbeCodigoProduto
+    end
+    object Label4: TLabel
+      Left = 47
+      Top = 82
+      Width = 68
+      Height = 15
+      Caption = 'Quantidade :'
+      FocusControl = dbeQuantidade
+    end
+    object Label5: TLabel
+      Left = 34
+      Top = 110
+      Width = 81
+      Height = 15
+      Caption = 'Pre'#231'o Unit'#225'rio :'
+      FocusControl = dbePrecoUnitario
+    end
+    object Label6: TLabel
+      Left = 38
+      Top = 140
+      Width = 77
+      Height = 15
+      Caption = 'Desconto (%) :'
+      FocusControl = dbeDesconto
+    end
+    object Label7: TLabel
+      Left = 32
+      Top = 169
+      Width = 83
+      Height = 15
+      Caption = 'Acr'#233'scimo (%) :'
+      FocusControl = dbeAcrescimo
+    end
+    object Label8: TLabel
+      Left = 40
+      Top = 200
+      Width = 75
+      Height = 15
+      Caption = 'Total L'#237'quido :'
+      FocusControl = dbeTotalLiquido
+    end
+    object dbeCodigo: TDBEdit
+      Left = 121
+      Top = 21
+      Width = 154
+      Height = 23
+      Color = clBtnFace
+      DataField = 'CODIGO'
+      Enabled = False
+      TabOrder = 0
+    end
+    object dbeCodigoProduto: TDBEdit
+      Left = 121
+      Top = 50
+      Width = 91
+      Height = 23
+      DataField = 'CODIGO_PRODUTO'
+      TabOrder = 1
+    end
+    object dbeQuantidade: TDBEdit
+      Left = 121
+      Top = 79
+      Width = 151
+      Height = 23
+      DataField = 'QUANTIDADE'
+      TabOrder = 2
+    end
+    object dbePrecoUnitario: TDBEdit
+      Left = 121
+      Top = 108
+      Width = 138
+      Height = 23
+      Color = clBtnFace
+      DataField = 'PRECO_UNITARIO'
+      Enabled = False
+      TabOrder = 3
+    end
+    object dbeDesconto: TDBEdit
+      Left = 121
+      Top = 137
+      Width = 265
+      Height = 23
+      DataField = 'DESCONTO'
+      TabOrder = 4
+    end
+    object dbeAcrescimo: TDBEdit
+      Left = 121
+      Top = 166
+      Width = 265
+      Height = 23
+      DataField = 'ACRESCIMO'
+      TabOrder = 5
+    end
+    object dbeTotalLiquido: TDBEdit
+      Left = 121
+      Top = 195
+      Width = 265
+      Height = 23
+      DataField = 'TOTAL_LIQUIDO'
+      TabOrder = 6
+    end
+    object dbeDescricaoProduto: TDBEdit
+      Left = 218
+      Top = 50
+      Width = 168
+      Height = 23
+      Color = clBtnFace
+      DataField = 'DESCRICAO'
+      Enabled = False
+      TabOrder = 7
+    end
+  end
+  inherited pBotoes: TPanel
+    Top = 295
+    Width = 672
+    inherited btnInserir: TButton
+      Left = 310
+    end
+    inherited btnEditar: TButton
+      Left = 382
+    end
+    inherited btnGravar: TButton
+      Left = 453
+    end
+    inherited btnCancelar: TButton
+      Left = 524
+    end
+    inherited btnExcluir: TButton
+      Left = 595
+    end
+  end
+  inherited ibqCadastro: TIBQuery
+    SQL.Strings = (
+      'SELECT VI.*'
+      'FROM VENDA_ITEM VI'
+      'WHERE VI.CODIGO > 0'
+      '   AND VI.CODIGO_VENDA = :CODIGO_VENDA')
+    ParamData = <
+      item
+        DataType = ftUnknown
+        Name = 'CODIGO_VENDA'
+        ParamType = ptUnknown
+      end>
+  end
+  inherited IBUpdateSQLCadastro: TIBUpdateSQL
+    RefreshSQL.Strings = (
+      'Select '
+      '  CODIGO,'
+      '  CODIGO_VENDA,'
+      '  CODIGO_PRODUTO,'
+      '  QUANTIDADE,'
+      '  PRECO_UNITARIO,'
+      '  DESCONTO,'
+      '  ACRESCIMO,'
+      '  TOTAL_LIQUIDO'
+      'from VENDA_ITEM '
+      'where'
+      '  CODIGO = :CODIGO')
+    ModifySQL.Strings = (
+      'update VENDA_ITEM'
+      'set'
+      '  CODIGO_VENDA = :CODIGO_VENDA,'
+      '  CODIGO_PRODUTO = :CODIGO_PRODUTO,'
+      '  QUANTIDADE = :QUANTIDADE,'
+      '  PRECO_UNITARIO = :PRECO_UNITARIO,'
+      '  DESCONTO = :DESCONTO,'
+      '  ACRESCIMO = :ACRESCIMO,'
+      '  TOTAL_LIQUIDO = :TOTAL_LIQUIDO'
+      'where'
+      '  CODIGO = :OLD_CODIGO')
+    InsertSQL.Strings = (
+      'insert into VENDA_ITEM'
+      
+        '  (CODIGO_VENDA, CODIGO_PRODUTO, QUANTIDADE, PRECO_UNITARIO, DES' +
+        'CONTO, '
+      '   ACRESCIMO, TOTAL_LIQUIDO)'
+      'values'
+      
+        '  (:CODIGO_VENDA, :CODIGO_PRODUTO, :QUANTIDADE, :PRECO_UNITARIO,' +
+        ' :DESCONTO, '
+      '   :ACRESCIMO, :TOTAL_LIQUIDO)')
+    DeleteSQL.Strings = (
+      'delete from VENDA_ITEM'
+      'where'
+      '  CODIGO = :OLD_CODIGO')
+  end
+end

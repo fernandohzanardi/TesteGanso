@@ -1,0 +1,26 @@
+unit uCadastroVendasItens;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uCadastroPadrao, IBX.IBCustomDataSet,
+  IBX.IBUpdateSQL, Data.DB, IBX.IBQuery, IBX.IBDatabase, Vcl.StdCtrls,
+  Vcl.ExtCtrls;
+
+type
+  TfrmCadastroVendasItens = class(TfrmCadastroPadrao)
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmCadastroVendasItens: TfrmCadastroVendasItens;
+
+implementation
+
+{$R *.dfm}
+
+end.

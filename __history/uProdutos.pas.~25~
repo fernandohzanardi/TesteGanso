@@ -1,0 +1,181 @@
+unit uProdutos;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Data.DB,
+  IBX.IBCustomDataSet, IBX.IBDatabase, IBX.IBQuery, Vcl.StdCtrls, Vcl.Mask,
+  Vcl.DBCtrls, IBX.IBUpdateSQL;
+
+type
+  TfrmProdutos = class(TForm)
+    pCampos: TPanel;
+    pBotoes: TPanel;
+    ibqCadastro: TIBQuery;
+    IBTransaction: TIBTransaction;
+    dsCadastro: TDataSource;
+    ibqCadastroCODIGO: TIntegerField;
+    ibqCadastroDESCRICAO: TIBStringField;
+    ibqCadastroREFERENCIA: TIBStringField;
+    ibqCadastroCODIGO_BARRAS: TLargeintField;
+    ibqCadastroMARCA: TIBStringField;
+    ibqCadastroGRUPO: TIBStringField;
+    ibqCadastroPRECO_VENDA: TIBBCDField;
+    ibqCadastroESTOQUE_ATUAL: TIBBCDField;
+    Label1: TLabel;
+    dbeCodigo: TDBEdit;
+    Label2: TLabel;
+    dbeDescricao: TDBEdit;
+    Label3: TLabel;
+    dbeReferencia: TDBEdit;
+    Label4: TLabel;
+    dbeCodigoBarras: TDBEdit;
+    Label5: TLabel;
+    dbeMarca: TDBEdit;
+    Label6: TLabel;
+    dbeGrupo: TDBEdit;
+    Label7: TLabel;
+    dbePrecoVenda: TDBEdit;
+    Label8: TLabel;
+    dbeEstoqueAtual: TDBEdit;
+    btnPrimeiro: TButton;
+    btnAnterior: TButton;
+    btnProximo: TButton;
+    btnUltimo: TButton;
+    btnInserir: TButton;
+    btnEditar: TButton;
+    btnGravar: TButton;
+    btnCancelar: TButton;
+    btnExcluir: TButton;
+    IBUpdateSQLCadastro: TIBUpdateSQL;
+    procedure btnPrimeiroClick(Sender: TObject);
+    procedure btnAnteriorClick(Sender: TObject);
+    procedure btnProximoClick(Sender: TObject);
+    procedure btnUltimoClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure btnInserirClick(Sender: TObject);
+    procedure btnEditarClick(Sender: TObject);
+    procedure btnGravarClick(Sender: TObject);
+    procedure btnCancelarClick(Sender: TObject);
+    procedure btnExcluirClick(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+  private
+    procedure ManutencaoBancoDados;
+    procedure HabilitaBotoes(Status: Boolean; Operacao: string);
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmProdutos: TfrmProdutos;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmProdutos.btnAnteriorClick(Sender: TObject);
+begin
+  ibqCadastro.Prior;
+end;
+
+procedure TfrmProdutos.btnCancelarClick(Sender: TObject);
+begin
+  if (ibqCadastro.State in [dsInsert, dsEdit]) then
+    ibqCadastro.Cancel;
+
+  HabilitaBotoes(false, '');
+end;
+
+procedure TfrmProdutos.btnEditarClick(Sender: TObject);
+begin
+  HabilitaBotoes(false, 'Editar');
+  ibqCadastro.Edit;
+end;
+
+procedure TfrmProdutos.btnExcluirClick(Sender: TObject);
+begin
+ if MessageDlg('Confirma Exclusão?',
+    mtConfirmation, [mbYes, mbNo], 0, mbYes) = mrYes then
+   ibqCadastro.Delete;
+end;
+
+procedure TfrmProdutos.btnGravarClick(Sender: TObject);
+begin
+//  ManutencaoBancoDados;
+  if (ibqCadastro.State in [dsInsert, dsEdit]) then
+    ibqCadastro.Post;
+end;
+
+procedure TfrmProdutos.btnInserirClick(Sender: TObject);
+begin
+  HabilitaBotoes(false, 'Inserir');
+  ibqCadastro.Append;
+end;
+
+procedure TfrmProdutos.btnPrimeiroClick(Sender: TObject);
+begin
+  ibqCadastro.First;
+end;
+
+procedure TfrmProdutos.btnProximoClick(Sender: TObject);
+begin
+  ibqCadastro.Next;
+end;
+
+procedure TfrmProdutos.btnUltimoClick(Sender: TObject);
+begin
+  ibqCadastro.Last;
+end;
+
+procedure TfrmProdutos.FormActivate(Sender: TObject);
+begin
+  HabilitaBotoes(False, '');
+  ibqCadastro.Open;
+end;
+
+procedure TfrmProdutos.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Action := caFree;
+  frmProdutos := Nil;
+end;
+
+procedure TfrmProdutos.ManutencaoBancoDados;
+begin
+  if (not ibqCadastro.Transaction.InTransaction) then
+    ibqCadastro.Transaction.StartTransaction;
+
+   try
+     if (ibqCadastro.State in [dsInsert, dsEdit]) then
+       ibqCadastro.Post;
+
+     ibqCadastro.Transaction.Commit;
+   Except
+
+     ibqCadastro.Transaction.Rollback;
+   end;
+end;
+
+procedure TfrmProdutos.HabilitaBotoes(Status: Boolean; Operacao: string);
+begin
+  btnInserir.Enabled :=  Status;
+  btnEditar.Enabled := Status;
+  btnGravar.Enabled := Status;
+  btnCancelar.Enabled := Status;
+  btnExcluir.Enabled := Status;
+
+  if (ibqCadastro.State in [dsEdit, dsInsert]) then
+  begin
+    btnGravar.Enabled := not Status;
+    btnCancelar.Enabled := not Status;
+  end
+  else if (ibqCadastro.State in [dsBrowse]) then
+  begin
+    btnInserir.Enabled := not Status;
+    btnEditar.Enabled := not Status;
+    btnexcluir.Enabled := not Status;
+  end;
+ end;
+
+end.

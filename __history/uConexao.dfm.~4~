@@ -1,0 +1,15 @@
+object dmConexao: TdmConexao
+  Height = 480
+  Width = 640
+  PixelsPerInch = 96
+  object IBDConexao: TIBDatabase
+    Connected = True
+    DatabaseName = 'C:\Avaliacao Delphi_firebird\Fernando Zanardi\Dados\BDAVALIACAO'
+    Params.Strings = (
+      'user_name=sysdba')
+    LoginPrompt = False
+    ServerType = 'IBServer'
+    Left = 48
+    Top = 40
+  end
+end

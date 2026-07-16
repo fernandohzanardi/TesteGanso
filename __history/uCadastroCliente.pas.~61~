@@ -1,0 +1,114 @@
+unit uCadastroCliente;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uCadastroPadrao, IBX.IBCustomDataSet,
+  IBX.IBUpdateSQL, Data.DB, IBX.IBQuery, IBX.IBDatabase, Vcl.StdCtrls,
+  Vcl.ExtCtrls, Vcl.DBCtrls, Vcl.Mask;
+
+type
+  TfrmCadastroClientes = class(TfrmCadastroPadrao)
+    lCodigo: TLabel;
+    lNome: TLabel;
+    lEndereco: TLabel;
+    lBairro: TLabel;
+    lCidade: TLabel;
+    lTelefone: TLabel;
+    lObservacao: TLabel;
+    lRendaMensal: TLabel;
+    lLimiteCredito: TLabel;
+    lTotalCompras: TLabel;
+    dbeCodigo: TDBEdit;
+    dbeNome: TDBEdit;
+    dbeEndereco: TDBEdit;
+    dbeBairro: TDBEdit;
+    dbeCidade: TDBEdit;
+    dbeTelefone: TDBEdit;
+    dbeRendaMensal: TDBEdit;
+    dbeLimiteCredito: TDBEdit;
+    dbmObservacao: TDBMemo;
+    ibqAtualiza: TIBQuery;
+    ibqAtualizaTOTAL_COMPRAS: TIBBCDField;
+    ibqCadastroCODIGO: TIntegerField;
+    ibqCadastroNOME: TIBStringField;
+    ibqCadastroENDERECO: TIBStringField;
+    ibqCadastroBAIRRO: TIBStringField;
+    ibqCadastroCIDADE: TIBStringField;
+    ibqCadastroTELEFONE: TIBStringField;
+    ibqCadastroOBSERVACAO: TBlobField;
+    ibqCadastroRENDA_MENSAL: TIBBCDField;
+    ibqCadastroLIMITE_CREDITO: TIBBCDField;
+    ibqCadastroTOTAL_COMPRAS: TIBBCDField;
+    dbeTotalCompras: TDBEdit;
+    bAtualizar: TButton;
+    procedure bAtualizarClick(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure btnInserirClick(Sender: TObject);
+    procedure btnEditarClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure dsCadastroDataChange(Sender: TObject; Field: TField);
+  private
+    procedure FocusEditarSalvar;
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmCadastroClientes: TfrmCadastroClientes;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmCadastroClientes.bAtualizarClick(Sender: TObject);
+begin
+  ibqCadastro.Refresh;
+end;
+
+procedure TfrmCadastroClientes.btnEditarClick(Sender: TObject);
+begin
+  inherited;
+  FocusEditarSalvar;
+end;
+
+procedure TfrmCadastroClientes.btnInserirClick(Sender: TObject);
+begin
+  inherited;
+  FocusEditarSalvar;
+end;
+
+procedure TfrmCadastroClientes.dsCadastroDataChange(Sender: TObject;
+  Field: TField);
+begin
+  inherited;
+  bAtualizar.Enabled := btnInserir.Enabled;
+end;
+
+procedure TfrmCadastroClientes.FormActivate(Sender: TObject);
+begin
+  inherited;
+
+  try
+    ibqCadastro.Open;
+  except
+    ShowMessage('Conexão falhou!');
+  end;
+end;
+
+procedure TfrmCadastroClientes.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  inherited;
+  frmCadastroClientes := Nil;
+end;
+
+procedure TfrmCadastroClientes.FocusEditarSalvar;
+begin
+  if not (dbeNome.Focused) then
+    dbeNome.SetFocus;
+end;
+
+end.

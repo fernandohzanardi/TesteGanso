@@ -1,0 +1,444 @@
+object frmInserirAlterarItens: TfrmInserirAlterarItens
+  Left = 0
+  Top = 0
+  Caption = 'Inserir/Alterar Itens'
+  ClientHeight = 276
+  ClientWidth = 524
+  Color = clBtnFace
+  ParentFont = True
+  Position = poMainFormCenter
+  OnActivate = FormActivate
+  OnClose = FormClose
+  OnKeyDown = FormKeyDown
+  PixelsPerInch = 96
+  TextHeight = 15
+  object pCampos: TPanel
+    Left = 0
+    Top = 0
+    Width = 524
+    Height = 227
+    Align = alClient
+    TabOrder = 0
+    object lCodigo: TLabel
+      Left = 70
+      Top = 24
+      Width = 45
+      Height = 15
+      Caption = 'C'#243'digo :'
+      FocusControl = dbeCodigo
+    end
+    object lCodigoProduto: TLabel
+      Left = 66
+      Top = 53
+      Width = 49
+      Height = 15
+      Caption = 'Produto :'
+      FocusControl = dbeCodigoProduto
+    end
+    object lQuantidade: TLabel
+      Left = 47
+      Top = 82
+      Width = 68
+      Height = 15
+      Caption = 'Quantidade :'
+      FocusControl = dbeQuantidade
+    end
+    object lPrecoUnitario: TLabel
+      Left = 34
+      Top = 110
+      Width = 81
+      Height = 15
+      Caption = 'Pre'#231'o Unit'#225'rio :'
+      FocusControl = dbePrecoUnitario
+    end
+    object lDesconto: TLabel
+      Left = 38
+      Top = 140
+      Width = 77
+      Height = 15
+      Caption = 'Desconto (%) :'
+      FocusControl = dbeDesconto
+    end
+    object lAcrescimo: TLabel
+      Left = 32
+      Top = 169
+      Width = 83
+      Height = 15
+      Caption = 'Acr'#233'scimo (%) :'
+      FocusControl = dbeAcrescimo
+    end
+    object lTotalLiquido: TLabel
+      Left = 40
+      Top = 200
+      Width = 75
+      Height = 15
+      Caption = 'Total L'#237'quido :'
+      FocusControl = dbeTotalLiquido
+    end
+    object dbeCodigo: TDBEdit
+      Left = 121
+      Top = 21
+      Width = 154
+      Height = 23
+      Color = clBtnFace
+      DataField = 'CODIGO'
+      DataSource = dsVendaitem
+      Enabled = False
+      TabOrder = 0
+    end
+    object dbeCodigoProduto: TDBEdit
+      Left = 121
+      Top = 50
+      Width = 91
+      Height = 23
+      DataField = 'CODIGO_PRODUTO'
+      DataSource = dsVendaitem
+      TabOrder = 1
+      OnChange = dbeCodigoProdutoChange
+    end
+    object dbeQuantidade: TDBEdit
+      Left = 121
+      Top = 79
+      Width = 151
+      Height = 23
+      DataField = 'QUANTIDADE'
+      DataSource = dsVendaitem
+      TabOrder = 3
+      OnExit = dbeQuantidadeExit
+    end
+    object dbePrecoUnitario: TDBEdit
+      Left = 121
+      Top = 108
+      Width = 138
+      Height = 23
+      Color = clBtnFace
+      DataField = 'PRECO_UNITARIO'
+      DataSource = dsVendaitem
+      Enabled = False
+      TabOrder = 4
+    end
+    object dbeDesconto: TDBEdit
+      Left = 121
+      Top = 137
+      Width = 265
+      Height = 23
+      DataField = 'DESCONTO'
+      DataSource = dsVendaitem
+      TabOrder = 5
+      OnChange = dbeDescontoChange
+      OnExit = dbeDescontoExit
+    end
+    object dbeAcrescimo: TDBEdit
+      Left = 121
+      Top = 166
+      Width = 265
+      Height = 23
+      DataField = 'ACRESCIMO'
+      DataSource = dsVendaitem
+      TabOrder = 6
+      OnChange = dbeAcrescimoChange
+      OnExit = dbeAcrescimoExit
+    end
+    object dbeTotalLiquido: TDBEdit
+      Left = 121
+      Top = 195
+      Width = 265
+      Height = 23
+      DataField = 'TOTAL_LIQUIDO'
+      DataSource = dsVendaitem
+      Enabled = False
+      ReadOnly = True
+      TabOrder = 7
+    end
+    object dbeDescricaoProduto: TDBEdit
+      Left = 218
+      Top = 50
+      Width = 168
+      Height = 23
+      Color = clBtnFace
+      DataField = 'DESCRICAO'
+      DataSource = dsProduto
+      Enabled = False
+      TabOrder = 2
+      OnChange = dbeDescontoChange
+    end
+  end
+  object pBotoes: TPanel
+    Left = 0
+    Top = 227
+    Width = 524
+    Height = 49
+    Align = alBottom
+    TabOrder = 1
+    DesignSize = (
+      524
+      49)
+    object btnPrimeiro: TButton
+      AlignWithMargins = True
+      Left = 8
+      Top = 11
+      Width = 30
+      Height = 25
+      Anchors = [akLeft]
+      Caption = '<<'
+      TabOrder = 0
+      OnClick = btnPrimeiroClick
+    end
+    object btnAnterior: TButton
+      AlignWithMargins = True
+      Left = 37
+      Top = 11
+      Width = 30
+      Height = 25
+      Anchors = [akLeft]
+      Caption = '<'
+      TabOrder = 1
+      OnClick = btnAnteriorClick
+    end
+    object btnProximo: TButton
+      AlignWithMargins = True
+      Left = 66
+      Top = 11
+      Width = 30
+      Height = 25
+      Anchors = [akLeft]
+      Caption = '>'
+      TabOrder = 2
+      OnClick = btnProximoClick
+    end
+    object btnUltimo: TButton
+      AlignWithMargins = True
+      Left = 95
+      Top = 11
+      Width = 30
+      Height = 25
+      Anchors = [akLeft]
+      Caption = '>>'
+      TabOrder = 3
+      OnClick = btnUltimoClick
+    end
+    object btnInserir: TButton
+      AlignWithMargins = True
+      Left = 159
+      Top = 11
+      Width = 71
+      Height = 25
+      Anchors = [akRight]
+      Caption = 'Inserir'
+      TabOrder = 4
+      OnClick = btnInserirClick
+    end
+    object btnEditar: TButton
+      AlignWithMargins = True
+      Left = 231
+      Top = 11
+      Width = 70
+      Height = 25
+      Anchors = [akRight]
+      Caption = 'Editar'
+      TabOrder = 5
+      OnClick = btnEditarClick
+    end
+    object btnGravar: TButton
+      AlignWithMargins = True
+      Left = 297
+      Top = 11
+      Width = 70
+      Height = 25
+      Anchors = [akRight]
+      Caption = 'Gravar'
+      TabOrder = 6
+      OnClick = btnGravarClick
+    end
+    object btnCancelar: TButton
+      AlignWithMargins = True
+      Left = 373
+      Top = 11
+      Width = 70
+      Height = 25
+      Anchors = [akRight]
+      Caption = 'Cancelar'
+      TabOrder = 7
+      OnClick = btnCancelarClick
+    end
+    object btnExcluir: TButton
+      AlignWithMargins = True
+      Left = 444
+      Top = 11
+      Width = 70
+      Height = 25
+      Anchors = [akRight]
+      Caption = 'Excluir'
+      TabOrder = 8
+      OnClick = btnExcluirClick
+    end
+  end
+  object ibqVendaitem: TIBQuery
+    Database = dmConexao.IBDConexao
+    Transaction = IBTransactionVendaitem
+    BufferChunks = 1000
+    CachedUpdates = False
+    ParamCheck = True
+    SQL.Strings = (
+      'SELECT VI.*'
+      'FROM VENDA_ITEM VI'
+      'WHERE VI.CODIGO > 0'
+      '   AND VI.CODIGO_VENDA = :CODIGO_VENDA')
+    UpdateObject = IBUpdateSQLVendaitem
+    GeneratorField.Field = 'CODIGO'
+    GeneratorField.Generator = 'GEN_VENDA_ITEM_ID'
+    GeneratorField.ApplyEvent = gamOnServer
+    PrecommittedReads = False
+    Left = 368
+    Top = 48
+    ParamData = <
+      item
+        DataType = ftUnknown
+        Name = 'CODIGO_VENDA'
+        ParamType = ptUnknown
+      end>
+    object ibqVendaitemCODIGO: TIntegerField
+      DisplayLabel = 'C'#243'digo :'
+      FieldName = 'CODIGO'
+      Origin = 'VENDA_ITEM.CODIGO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object ibqVendaitemCODIGO_VENDA: TIntegerField
+      DisplayLabel = 'C'#243'digo da Venda :'
+      FieldName = 'CODIGO_VENDA'
+      Origin = 'VENDA_ITEM.CODIGO_VENDA'
+      Required = True
+    end
+    object ibqVendaitemCODIGO_PRODUTO: TIntegerField
+      DisplayLabel = 'C'#243'digo do Produto :'
+      FieldName = 'CODIGO_PRODUTO'
+      Origin = 'VENDA_ITEM.CODIGO_PRODUTO'
+      Required = True
+    end
+    object ibqVendaitemQUANTIDADE: TIBBCDField
+      DisplayLabel = 'Quantidade :'
+      FieldName = 'QUANTIDADE'
+      Origin = 'VENDA_ITEM.QUANTIDADE'
+      Required = True
+      Precision = 18
+      Size = 3
+    end
+    object ibqVendaitemPRECO_UNITARIO: TIBBCDField
+      DisplayLabel = 'Pre'#231'o Unit'#225'rio :'
+      FieldName = 'PRECO_UNITARIO'
+      Origin = 'VENDA_ITEM.PRECO_UNITARIO'
+      Required = True
+      currency = True
+      Precision = 18
+      Size = 2
+    end
+    object ibqVendaitemDESCONTO: TIBBCDField
+      DisplayLabel = 'Desconto (%) :'
+      FieldName = 'DESCONTO'
+      Origin = 'VENDA_ITEM.DESCONTO'
+      Precision = 18
+      Size = 4
+    end
+    object ibqVendaitemACRESCIMO: TIBBCDField
+      DisplayLabel = 'Acr'#233'scimo (%) :'
+      FieldName = 'ACRESCIMO'
+      Origin = 'VENDA_ITEM.ACRESCIMO'
+      Precision = 18
+      Size = 4
+    end
+    object ibqVendaitemTOTAL_LIQUIDO: TIBBCDField
+      DisplayLabel = 'Total L'#237'quido :'
+      FieldName = 'TOTAL_LIQUIDO'
+      Origin = 'VENDA_ITEM.TOTAL_LIQUIDO'
+      Required = True
+      currency = True
+      Precision = 18
+      Size = 2
+    end
+  end
+  object IBTransactionVendaitem: TIBTransaction
+    Active = True
+    DefaultDatabase = dmConexao.IBDConexao
+    Params.Strings = (
+      'read_committed'
+      'rec_version'
+      'nowait')
+    Left = 328
+    Top = 16
+  end
+  object dsVendaitem: TDataSource
+    DataSet = ibqVendaitem
+    OnDataChange = dsVendaitemDataChange
+    Left = 328
+    Top = 80
+  end
+  object IBUpdateSQLVendaitem: TIBUpdateSQL
+    RefreshSQL.Strings = (
+      'Select '
+      '  CODIGO,'
+      '  CODIGO_VENDA,'
+      '  CODIGO_PRODUTO,'
+      '  QUANTIDADE,'
+      '  PRECO_UNITARIO,'
+      '  DESCONTO,'
+      '  ACRESCIMO,'
+      '  TOTAL_LIQUIDO'
+      'from VENDA_ITEM '
+      'where'
+      '  CODIGO = :CODIGO')
+    ModifySQL.Strings = (
+      'update VENDA_ITEM'
+      'set'
+      '  CODIGO_VENDA = :CODIGO_VENDA,'
+      '  CODIGO_PRODUTO = :CODIGO_PRODUTO,'
+      '  QUANTIDADE = :QUANTIDADE,'
+      '  PRECO_UNITARIO = :PRECO_UNITARIO,'
+      '  DESCONTO = :DESCONTO,'
+      '  ACRESCIMO = :ACRESCIMO,'
+      '  TOTAL_LIQUIDO = :TOTAL_LIQUIDO'
+      'where'
+      '  CODIGO = :OLD_CODIGO')
+    InsertSQL.Strings = (
+      'insert into VENDA_ITEM'
+      
+        '  (CODIGO_VENDA, CODIGO_PRODUTO, QUANTIDADE, PRECO_UNITARIO, DES' +
+        'CONTO, '
+      '   ACRESCIMO, TOTAL_LIQUIDO)'
+      'values'
+      
+        '  (:CODIGO_VENDA, :CODIGO_PRODUTO, :QUANTIDADE, :PRECO_UNITARIO,' +
+        ' :DESCONTO, '
+      '   :ACRESCIMO, :TOTAL_LIQUIDO)')
+    DeleteSQL.Strings = (
+      'delete from VENDA_ITEM'
+      'where'
+      '  CODIGO = :OLD_CODIGO')
+    Left = 424
+    Top = 16
+  end
+  object dsProduto: TDataSource
+    DataSet = ibqProduto
+    Left = 367
+    Top = 152
+  end
+  object ibqProduto: TIBQuery
+    Database = dmConexao.IBDConexao
+    BufferChunks = 1000
+    CachedUpdates = False
+    ParamCheck = True
+    SQL.Strings = (
+      'SELECT P.CODIGO, P.DESCRICAO, P.PRECO_VENDA '
+      'FROM PRODUTO P'
+      'WHERE P.CODIGO = :CODIGO_PRODUTO')
+    PrecommittedReads = False
+    Left = 432
+    Top = 112
+    ParamData = <
+      item
+        DataType = ftUnknown
+        Name = 'CODIGO_PRODUTO'
+        ParamType = ptUnknown
+      end>
+  end
+end
