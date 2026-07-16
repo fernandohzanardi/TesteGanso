@@ -97,14 +97,17 @@ begin
 end;
 
 procedure TfrmCadastroProdutos.AtualizaPercLucro;
+var Valor: Extended;
 begin
 // Retirado Validação
-  if ePercLucro.Text <> '' then
-  begin
+  Valor := 0.00;
   ePercLucro.Text := FormatFloat('0.00',
     TUcalculaFuncFinan.CalculaPercLucro(ibqCadastroVALOR_CUSTO.AsCurrency,
       ibqCadastroPRECO_VENDA.AsCurrency)) + ' %';
-  end;
+  Valor :=  TUcalculaFuncFinan.CalculaPercLucro(ibqCadastroVALOR_CUSTO.AsCurrency,
+      ibqCadastroPRECO_VENDA.AsCurrency);
+      ShowMessage('Valor é: '+FloattoStr(Valor));
+  //Alterado por Andre 16/07/2026
 end;
 
 procedure TfrmCadastroProdutos.dsCadastroDataChange(Sender: TObject;
