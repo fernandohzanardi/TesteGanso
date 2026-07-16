@@ -98,11 +98,7 @@ end;
 
 procedure TfrmCadastroProdutos.AtualizaPercLucro;
 begin
-  if ePercLucro.Text = '' then
-    ShowMessage('Valor em Branco');
-
-  if ePercLucro.Text = '0' then
-    ShowMessage('Valor Zerado');
+// Retirado Validação
 
   ePercLucro.Text := FormatFloat('0.00',
     TUcalculaFuncFinan.CalculaPercLucro(ibqCadastroVALOR_CUSTO.AsCurrency,
