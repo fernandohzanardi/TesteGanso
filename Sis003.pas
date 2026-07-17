@@ -1005,6 +1005,8 @@ begin
                               ' and cast(substr(f.dia_mes,4,10) as integer) = extract(month from cast('
                                 +StringReplace(QuotedStr(DateTimeToStr(RetornoData)),'/','.',[rfReplaceAll])+'as date))';
       _IBQuery999.Open;
+
+
       if (((not IgnorarFeriados) and(not _IBQuery999.IsEmpty)) or
           ((not IgnorarSabados)   and (DayOfWeek(RetornoData) = 7)) or
           ((not IgnorarDomingos)  and (DayOfWeek(RetornoData) = 1))) then
@@ -3414,7 +3416,15 @@ begin
       end;
       Exit;
     end;
+
   end;
+  _IBQuery999.Close;
+      _IBQuery999.SQL.Text := ' select f.codigo from feriados f '+
+                              ' where cast(substr(f.dia_mes,1,2) as integer) = extract(day from cast('
+                                +StringReplace(QuotedStr(DateTimeToStr(RetornoData)),'/','.',[rfReplaceAll])+'as date)) '+
+                              ' and cast(substr(f.dia_mes,4,10) as integer) = extract(month from cast('
+                                +StringReplace(QuotedStr(DateTimeToStr(RetornoData)),'/','.',[rfReplaceAll])+'as date))';
+      _IBQuery999.Open;
 
   //Tenta enviar a mensagem - Caso dê algum problema (provavelmente time out) joga pro except,
   //mas de qualquer forma destroi os componentes
