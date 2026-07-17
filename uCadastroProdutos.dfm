@@ -1,17 +1,17 @@
 inherited frmCadastroProdutos: TfrmCadastroProdutos
   Caption = 'Cadastro de Produtos'
-  ClientHeight = 319
-  ClientWidth = 694
+  ClientHeight = 448
+  ClientWidth = 774
   StyleElements = [seFont, seClient, seBorder]
   OnActivate = FormActivate
-  ExplicitWidth = 710
-  ExplicitHeight = 358
+  ExplicitWidth = 790
+  ExplicitHeight = 487
   TextHeight = 15
   inherited pCampos: TPanel
-    Width = 694
-    Height = 273
+    Width = 774
+    Height = 402
     StyleElements = [seFont, seClient, seBorder]
-    ExplicitWidth = 586
+    ExplicitWidth = 774
     ExplicitHeight = 273
     object lCodigo: TLabel
       Left = 67
@@ -102,13 +102,7 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
       Caption = 'Estoque Atual :'
       FocusControl = dbeEstoqueAtual
     end
-    object ImCliente: TImage
-      Left = 401
-      Top = 11
-      Width = 65
-      Height = 46
-    end
-    object Label1: TLabel
+    object LVendido: TLabel
       Left = 389
       Top = 213
       Width = 78
@@ -240,37 +234,50 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
       TabOrder = 12
       OnClick = btnTesteClick
     end
+    object DBGrid1: TDBGrid
+      Left = 43
+      Top = 280
+      Width = 529
+      Height = 97
+      DataSource = DataSource1
+      TabOrder = 13
+      TitleFont.Charset = DEFAULT_CHARSET
+      TitleFont.Color = clWindowText
+      TitleFont.Height = -12
+      TitleFont.Name = 'Segoe UI'
+      TitleFont.Style = []
+    end
   end
   inherited pBotoes: TPanel
-    Top = 273
-    Width = 694
+    Top = 402
+    Width = 774
     StyleElements = [seFont, seClient, seBorder]
     ExplicitTop = 273
-    ExplicitWidth = 586
+    ExplicitWidth = 774
     inherited btnInserir: TButton
-      Left = 332
-      ExplicitLeft = 224
+      Left = 412
+      ExplicitLeft = 412
     end
     inherited btnEditar: TButton
-      Left = 404
-      ExplicitLeft = 296
+      Left = 484
+      ExplicitLeft = 484
     end
     inherited btnGravar: TButton
-      Left = 475
-      ExplicitLeft = 367
+      Left = 555
+      ExplicitLeft = 555
     end
     inherited btnCancelar: TButton
-      Left = 546
-      ExplicitLeft = 438
+      Left = 626
+      ExplicitLeft = 626
     end
     inherited btnExcluir: TButton
-      Left = 617
-      ExplicitLeft = 509
+      Left = 697
+      ExplicitLeft = 697
     end
     inherited btnImprimir: TButton
-      Left = 795
+      Left = 875
       Visible = False
-      ExplicitLeft = 687
+      ExplicitLeft = 875
     end
     object Button1: TButton
       Left = 143
@@ -289,6 +296,15 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
       Caption = 'Atualizar Qtde'
       TabOrder = 10
       OnClick = btnQtdeVendidoClick
+    end
+    object btnExibeMensagem: TButton
+      Left = 329
+      Top = 11
+      Width = 75
+      Height = 25
+      Caption = 'Mensagem'
+      TabOrder = 12
+      OnClick = btnExibeMensagemClick
     end
   end
   inherited ibqCadastro: TIBQuery
@@ -432,11 +448,14 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
     DataSource = dsCadastro
     ParamCheck = True
     SQL.Strings = (
-      'select v.codigo, v.data_hora_venda, v.total_liquido'
-      'from venda v'
-      '  left join venda_item vi on vi.codigo_venda = v.codigo'
-      '  left join produto p on p.codigo = vi.codigo_produto'
-      'where v.data_hora_venda between :DIni and :DFim')
+      
+        'SELECT C.CODIGO, C.NOME, C.TELEFONE, V.CODIGO, V.DATA_HORA_VENDA' +
+        ', V.TOTAL_LIQUIDO'
+      'FROM VENDA V'
+      '  LEFT JOIN VENDA_ITEM VI ON VI.CODIGO_VENDA = V.CODIGO'
+      '  LEFT JOIN PRODUTO P ON P.CODIGO = VI.CODIGO_PRODUTO'
+      '  LEFT JOIN CLIENTE C ON C.CODIGO = V.CODIGO_CLIENTE'
+      'WHERE V.DATA_HORA_VENDA BETWEEN :DINI AND :DFIM')
     PrecommittedReads = False
     Left = 264
     Top = 40
@@ -467,5 +486,25 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
       Precision = 18
       Size = 2
     end
+    object IBQuery1NOME: TIBStringField
+      FieldName = 'NOME'
+      Origin = 'CLIENTE.NOME'
+      Size = 60
+    end
+    object IBQuery1TELEFONE: TIBStringField
+      FieldName = 'TELEFONE'
+      Origin = 'CLIENTE.TELEFONE'
+      Size = 16
+    end
+    object IBQuery1CODIGO1: TIntegerField
+      FieldName = 'CODIGO1'
+      Origin = 'VENDA.CODIGO'
+      Required = True
+    end
+  end
+  object DataSource1: TDataSource
+    DataSet = IBQuery1
+    Left = 608
+    Top = 208
   end
 end

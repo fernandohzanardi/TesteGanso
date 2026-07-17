@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uCadastroPadrao, IBX.IBCustomDataSet,
   IBX.IBUpdateSQL, Data.DB, IBX.IBQuery, IBX.IBDatabase, Vcl.StdCtrls,
   Vcl.ExtCtrls, Vcl.Mask, Vcl.DBCtrls, uCalculaFuncoesFinanceiras,
-  frxClass, frxDBSet;
+  frxClass, frxDBSet, Vcl.Grids, Vcl.DBGrids;
 
 type
   TfrmCadastroProdutos = class(TfrmCadastroPadrao)
@@ -40,7 +40,6 @@ type
     lPercLucro: TLabel;
     dbeValorCusto: TDBEdit;
     ePercLucro: TEdit;
-    ImCliente: TImage;
     ibConsultaQtdeVendas: TIBQuery;
     ibConsultaQtdeVendasQTDE_VENDA: TIntegerField;
     EqtdeVenda: TEdit;
@@ -51,8 +50,14 @@ type
     IBQuery1TOTAL_LIQUIDO: TIBBCDField;
     Button1: TButton;
     btnQtdeVendido: TButton;
-    Label1: TLabel;
+    LVendido: TLabel;
     btnTeste: TButton;
+    btnExibeMensagem: TButton;
+    IBQuery1NOME: TIBStringField;
+    IBQuery1TELEFONE: TIBStringField;
+    IBQuery1CODIGO1: TIntegerField;
+    DBGrid1: TDBGrid;
+    DataSource1: TDataSource;
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnInserirClick(Sender: TObject);
@@ -63,6 +68,7 @@ type
     procedure Button1Click(Sender: TObject);
     procedure btnQtdeVendidoClick(Sender: TObject);
     procedure btnTesteClick(Sender: TObject);
+    procedure btnExibeMensagemClick(Sender: TObject);
   private
     procedure FocusEditarSalvar;
     procedure AtualizaPercLucro;
@@ -98,6 +104,16 @@ procedure TfrmCadastroProdutos.btnEditarClick(Sender: TObject);
 begin
   inherited;
   FocusEditarSalvar;
+end;
+
+procedure TfrmCadastroProdutos.btnExibeMensagemClick(Sender: TObject);
+begin
+  inherited;
+  ShowMessage('Tela de Cadastro de Produto!');
+  IBQuery1.Close;
+  IBQuery1.ParamByName('DINI').AsDate := StrToDate('01/01/2026');
+  IBQuery1.ParamByName('DFIM').AsDate := StrToDate('31/07/2026');
+  IBQuery1.Open;
 end;
 
 procedure TfrmCadastroProdutos.btnInserirClick(Sender: TObject);
