@@ -2,17 +2,16 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
   Caption = 'Cadastro de Produtos'
   ClientHeight = 448
   ClientWidth = 774
-  StyleElements = [seFont, seClient, seBorder]
   OnActivate = FormActivate
   ExplicitWidth = 790
   ExplicitHeight = 487
+  PixelsPerInch = 96
   TextHeight = 15
   inherited pCampos: TPanel
     Width = 774
     Height = 402
-    StyleElements = [seFont, seClient, seBorder]
     ExplicitWidth = 774
-    ExplicitHeight = 273
+    ExplicitHeight = 402
     object lCodigo: TLabel
       Left = 67
       Top = 16
@@ -215,7 +214,7 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
       Height = 23
       TabStop = False
       ReadOnly = True
-      TabOrder = 10
+      TabOrder = 14
     end
     object Edit1: TEdit
       Left = 296
@@ -247,12 +246,19 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
       TitleFont.Name = 'Segoe UI'
       TitleFont.Style = []
     end
+    object Button1: TButton
+      Left = 143
+      Top = 12
+      Width = 75
+      Height = 25
+      Caption = 'Button1'
+      TabOrder = 10
+    end
   end
   inherited pBotoes: TPanel
     Top = 402
     Width = 774
-    StyleElements = [seFont, seClient, seBorder]
-    ExplicitTop = 273
+    ExplicitTop = 402
     ExplicitWidth = 774
     inherited btnInserir: TButton
       Left = 412
@@ -279,15 +285,6 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
       Visible = False
       ExplicitLeft = 875
     end
-    object Button1: TButton
-      Left = 143
-      Top = 12
-      Width = 75
-      Height = 25
-      Caption = 'BtnImprimir'
-      TabOrder = 11
-      OnClick = Button1Click
-    end
     object btnQtdeVendido: TButton
       Left = 229
       Top = 12
@@ -303,7 +300,7 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
       Width = 75
       Height = 25
       Caption = 'Mensagem'
-      TabOrder = 12
+      TabOrder = 11
       OnClick = btnExibeMensagemClick
     end
   end

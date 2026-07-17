@@ -8,6 +8,7 @@ uses
   IBX.IBUpdateSQL, Data.DB, IBX.IBQuery, IBX.IBDatabase, Vcl.StdCtrls,
   Vcl.ExtCtrls, Vcl.Mask, Vcl.DBCtrls, uCalculaFuncoesFinanceiras,
   frxClass, frxDBSet, Vcl.Grids, Vcl.DBGrids;
+  frxClass, frxDBSet, Vcl.Grids, Vcl.DBGrids;
 
 type
   TfrmCadastroProdutos = class(TfrmCadastroPadrao)
