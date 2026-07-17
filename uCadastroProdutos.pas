@@ -49,6 +49,7 @@ type
     IBQuery1CODIGO: TIntegerField;
     IBQuery1DATA_HORA_VENDA: TDateTimeField;
     IBQuery1TOTAL_LIQUIDO: TIBBCDField;
+    Button1: TButton;
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnInserirClick(Sender: TObject);
@@ -56,6 +57,7 @@ type
     procedure dsCadastroDataChange(Sender: TObject; Field: TField);
     procedure dbeValorCustoChange(Sender: TObject);
     procedure dbePrecoVendaChange(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
   private
     procedure FocusEditarSalvar;
     procedure AtualizaPercLucro;
@@ -108,6 +110,13 @@ begin
   if True then
     ShowMessage('Teste');
 
+end;
+
+procedure TfrmCadastroProdutos.Button1Click(Sender: TObject);
+begin
+  inherited;
+  ShowMessage('Clicado o Botão Imprimir!');
+  // Alterado por André Luis Dia 17/07/2026 as 15:45
 end;
 
 procedure TfrmCadastroProdutos.FocusEditarSalvar;
