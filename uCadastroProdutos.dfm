@@ -211,6 +211,14 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
       Height = 23
       TabOrder = 10
     end
+    object Edit1: TEdit
+      Left = 296
+      Top = 10
+      Width = 121
+      Height = 23
+      TabOrder = 11
+      Text = 'Edit1'
+    end
   end
   inherited pBotoes: TPanel
     Top = 239
@@ -245,6 +253,14 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
     object Button1: TButton
       Left = 143
       Top = 12
+      Width = 75
+      Height = 25
+      Caption = 'Button1'
+      TabOrder = 10
+    end
+    object Button1: TButton
+      Left = 131
+      Top = 16
       Width = 75
       Height = 25
       Caption = 'Button1'
@@ -384,5 +400,13 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
       ProviderFlags = []
       ReadOnly = True
     end
+  end
+  object IBQuery1: TIBQuery
+    BufferChunks = 1000
+    CachedUpdates = False
+    ParamCheck = True
+    PrecommittedReads = False
+    Left = 376
+    Top = 72
   end
 end
