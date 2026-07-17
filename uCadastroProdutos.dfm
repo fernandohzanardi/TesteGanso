@@ -2,14 +2,15 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
   Caption = 'Cadastro de Produtos'
   ClientHeight = 285
   ClientWidth = 586
+  StyleElements = [seFont, seClient, seBorder]
   OnActivate = FormActivate
   ExplicitWidth = 602
   ExplicitHeight = 324
-  PixelsPerInch = 96
   TextHeight = 15
   inherited pCampos: TPanel
     Width = 586
     Height = 239
+    StyleElements = [seFont, seClient, seBorder]
     ExplicitWidth = 586
     ExplicitHeight = 239
     object lCodigo: TLabel
@@ -223,6 +224,7 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
   inherited pBotoes: TPanel
     Top = 239
     Width = 586
+    StyleElements = [seFont, seClient, seBorder]
     ExplicitTop = 239
     ExplicitWidth = 586
     inherited btnInserir: TButton
@@ -253,14 +255,6 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
     object Button1: TButton
       Left = 143
       Top = 12
-      Width = 75
-      Height = 25
-      Caption = 'Button1'
-      TabOrder = 10
-    end
-    object Button1: TButton
-      Left = 131
-      Top = 16
       Width = 75
       Height = 25
       Caption = 'Button1'
@@ -402,11 +396,45 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
     end
   end
   object IBQuery1: TIBQuery
+    Database = dmConexao.IBDConexao
     BufferChunks = 1000
     CachedUpdates = False
     ParamCheck = True
+    SQL.Strings = (
+      'select v.codigo, v.data_hora_venda, v.total_liquido'
+      'from venda v'
+      '  left join venda_item vi on vi.codigo_venda = v.codigo'
+      '  left join produto p on p.codigo = vi.codigo_produto'
+      'where v.data_hora_venda between :DIni and :DFim')
     PrecommittedReads = False
-    Left = 376
-    Top = 72
+    Left = 264
+    Top = 40
+    ParamData = <
+      item
+        DataType = ftUnknown
+        Name = 'DIni'
+        ParamType = ptUnknown
+      end
+      item
+        DataType = ftUnknown
+        Name = 'DFim'
+        ParamType = ptUnknown
+      end>
+    object IBQuery1CODIGO: TIntegerField
+      FieldName = 'CODIGO'
+      Origin = 'VENDA.CODIGO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object IBQuery1DATA_HORA_VENDA: TDateTimeField
+      FieldName = 'DATA_HORA_VENDA'
+      Origin = 'VENDA.DATA_HORA_VENDA'
+    end
+    object IBQuery1TOTAL_LIQUIDO: TIBBCDField
+      FieldName = 'TOTAL_LIQUIDO'
+      Origin = 'VENDA.TOTAL_LIQUIDO'
+      Precision = 18
+      Size = 2
+    end
   end
 end

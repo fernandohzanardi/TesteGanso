@@ -48,6 +48,9 @@ type
     Button1: TButton;
     Edit1: TEdit;
     IBQuery1: TIBQuery;
+    IBQuery1CODIGO: TIntegerField;
+    IBQuery1DATA_HORA_VENDA: TDateTimeField;
+    IBQuery1TOTAL_LIQUIDO: TIBBCDField;
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnInserirClick(Sender: TObject);
