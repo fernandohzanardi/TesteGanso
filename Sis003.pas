@@ -5020,7 +5020,7 @@ end;
 
 procedure ConsultaF2(Self : TComponent; ActiveControl : TWinControl; _Campo, _Arquivo : String; _Leitura : Boolean = False; _F2Par1: Integer = 0; const pFilial: Integer = 0);
 var
-  _sqlF2, _tituloF2, _retornoF2, _Titulos, lNomeCliente, lRetornoF2OsAbertura : string;
+  _sqlF2, _sqlF3, _tituloF2, _retornoF2, _Titulos, lNomeCliente, lRetornoF2OsAbertura : string;
   lFilial: Integer;
 begin
   _TemCodFilialEmp := True;
@@ -5682,6 +5682,17 @@ begin
            + 'WHERE tipo_produto = ' + QuotedStr('TERCEIRO');
       _TabelaPrincipal := 'V_MEDICAMENTO';
       _Titulos := 'Código@,Código ABCFarma,Descrição do Produto,Apresentação do Medicamento@,Ref.Auxiliar@,Genérico,Princípio Ativo@,Preço Laboratório@,Preço Máximo@,Preço Fração$,Quantidade Fração,Vlr.Unitário$,Estoque Físico;,Estoque Reservado;,Código Barras,';
+    end
+    else if _ParRamo = 'BUTECO' then
+    begin
+      _sqlF3 := 'SELECT B.CODIGO, B.DESCRICAO, BT.DESCRICAO_TIPO, BM.DESCRICAO_MARCA, B.DATA_COMPRA, B.VALOR_VENDA'
+           + 'FROM BEBIDA B'
+           + 'JOIN BEBIDA_TIPO BT ON BT.CODIGO_BEBIDA = B.CODIGO'
+           + 'JOIN BEBIDA_MARCA BM ON BM.CODIGO_BEBIDA = B.CODIGO'
+           + 'WHERE (B.CODIGO = ' + IntToStr(_Cod_bebida) + ') ';
+      _TabelaPrincipal := 'V_BEBIDA';
+
+      _Titulos := 'Teste de Conflito';
     end
     else if (_ParRamo = 'OFICINA')or(_ParRamo = 'COMÉRCIO DE TINTAS') then
     begin
