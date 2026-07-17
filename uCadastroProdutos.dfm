@@ -250,22 +250,6 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
       Visible = False
       ExplicitLeft = 687
     end
-    object Button1: TButton
-      Left = 143
-      Top = 12
-      Width = 75
-      Height = 25
-      Caption = 'Button1'
-      TabOrder = 10
-    end
-    object Button1: TButton
-      Left = 131
-      Top = 16
-      Width = 75
-      Height = 25
-      Caption = 'Button1'
-      TabOrder = 10
-    end
   end
   inherited ibqCadastro: TIBQuery
     SQL.Strings = (
@@ -404,7 +388,10 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
   object IBQuery1: TIBQuery
     BufferChunks = 1000
     CachedUpdates = False
+    DataSource = dsCadastro
     ParamCheck = True
+    SQL.Strings = (
+      'select * from Produto')
     PrecommittedReads = False
     Left = 376
     Top = 72

@@ -44,8 +44,6 @@ type
     ibConsultaQtdeVendas: TIBQuery;
     ibConsultaQtdeVendasQTDE_VENDA: TIntegerField;
     EqtdeVenda: TEdit;
-
-    Button1: TButton;
     Edit1: TEdit;
     IBQuery1: TIBQuery;
     procedure FormActivate(Sender: TObject);
