@@ -49,6 +49,9 @@ type
     IBQuery1CODIGO: TIntegerField;
     IBQuery1DATA_HORA_VENDA: TDateTimeField;
     IBQuery1TOTAL_LIQUIDO: TIBBCDField;
+    btnQtdeVendido: TButton;
+    Label1: TLabel;
+    btnTeste: TButton;
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnInserirClick(Sender: TObject);
@@ -56,6 +59,8 @@ type
     procedure dsCadastroDataChange(Sender: TObject; Field: TField);
     procedure dbeValorCustoChange(Sender: TObject);
     procedure dbePrecoVendaChange(Sender: TObject);
+    procedure btnQtdeVendidoClick(Sender: TObject);
+    procedure btnTesteClick(Sender: TObject);
   private
     procedure FocusEditarSalvar;
     procedure AtualizaPercLucro;
@@ -110,6 +115,21 @@ begin
 
 end;
 
+procedure TfrmCadastroProdutos.btnQtdeVendidoClick(Sender: TObject);
+begin
+  ibConsultaQtdeVendas.Close;
+  ibConsultaQtdeVendas.ParamByName('codigo').AsInteger := ibqCadastroCodigo.Asinteger;
+  ibConsultaQtdeVendas.Open;
+
+  EqtdeVenda.Text := intToStr(ibConsultaQtdeVendas.FieldByName('qtde_venda').AsInteger);
+end;
+
+procedure TfrmCadastroProdutos.btnTesteClick(Sender: TObject);
+begin
+  inherited;
+  ShowMessage('Teste');
+end;
+
 procedure TfrmCadastroProdutos.FocusEditarSalvar;
 begin
   if not (dbeDescricao.Focused) then
@@ -139,11 +159,6 @@ begin
   inherited;
   AtualizaPercLucro;
 
-  ibConsultaQtdeVendas.Close;
-  ibConsultaQtdeVendas.ParamByName('codigo').AsInteger := ibqCadastroCodigo.Asinteger;
-  ibConsultaQtdeVendas.Open;
-
-  EqtdeVenda.Text := intToStr(ibConsultaQtdeVendas.FieldByName('qtde_venda').AsInteger);
 end;
 
 procedure TfrmCadastroProdutos.dbeValorCustoChange(Sender: TObject);

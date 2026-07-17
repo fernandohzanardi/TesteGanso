@@ -1,15 +1,15 @@
 inherited frmCadastroProdutos: TfrmCadastroProdutos
   Caption = 'Cadastro de Produtos'
-  ClientHeight = 285
+  ClientHeight = 319
   ClientWidth = 586
   StyleElements = [seFont, seClient, seBorder]
   OnActivate = FormActivate
   ExplicitWidth = 602
-  ExplicitHeight = 324
+  ExplicitHeight = 358
   TextHeight = 15
   inherited pCampos: TPanel
     Width = 586
-    Height = 239
+    Height = 273
     StyleElements = [seFont, seClient, seBorder]
     ExplicitWidth = 586
     ExplicitHeight = 239
@@ -107,6 +107,15 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
       Top = 11
       Width = 65
       Height = 46
+    end
+    object Label1: TLabel
+      Left = 389
+      Top = 213
+      Width = 78
+      Height = 15
+      Alignment = taRightJustify
+      Caption = 'Qtde Vendido :'
+      FocusControl = dbePrecoVenda
     end
     object dbeCodigo: TDBEdit
       Left = 118
@@ -210,6 +219,8 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
       Top = 210
       Width = 100
       Height = 23
+      TabStop = False
+      ReadOnly = True
       TabOrder = 10
     end
     object Edit1: TEdit
@@ -220,9 +231,18 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
       TabOrder = 11
       Text = 'Edit1'
     end
+    object btnTeste: TButton
+      Left = 497
+      Top = 239
+      Width = 75
+      Height = 25
+      Caption = 'Show Teste'
+      TabOrder = 12
+      OnClick = btnTesteClick
+    end
   end
   inherited pBotoes: TPanel
-    Top = 239
+    Top = 273
     Width = 586
     StyleElements = [seFont, seClient, seBorder]
     ExplicitTop = 239
@@ -251,6 +271,15 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
       Left = 687
       Visible = False
       ExplicitLeft = 687
+    end
+    object btnQtdeVendido: TButton
+      Left = 128
+      Top = 12
+      Width = 94
+      Height = 25
+      Caption = 'Atualizar Qtde'
+      TabOrder = 10
+      OnClick = btnQtdeVendidoClick
     end
   end
   inherited ibqCadastro: TIBQuery
@@ -373,8 +402,8 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
       '  join produto p on p.codigo = vi.codigo_produto'
       'where p.codigo = :codigo')
     PrecommittedReads = False
-    Left = 344
-    Top = 200
+    Left = 224
+    Top = 112
     ParamData = <
       item
         DataType = ftUnknown
