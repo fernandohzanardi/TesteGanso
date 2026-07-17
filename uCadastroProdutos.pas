@@ -40,6 +40,10 @@ type
     lPercLucro: TLabel;
     dbeValorCusto: TDBEdit;
     ePercLucro: TEdit;
+    ImCliente: TImage;
+    ibConsultaQtdeVendas: TIBQuery;
+    ibConsultaQtdeVendasQTDE_VENDA: TIntegerField;
+    EqtdeVenda: TEdit;
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnInserirClick(Sender: TObject);
@@ -103,11 +107,6 @@ begin
 //Validação
   Texto := '';
 
-  if (Trim(ePercLucro.Text) <> '') then
-    ShowMessage('Vazio!');
-
-  if StrToIntDef(ePercLucro.Text, 0) = 0 then
-    ShowMessage('Zerado!');
 
 //    ePercLucro.Text := FormatFloat('0.00',
 //      TUcalculaFuncFinan.CalculaPercLucro(ibqCadastroVALOR_CUSTO.AsCurrency,
@@ -123,6 +122,12 @@ procedure TfrmCadastroProdutos.dsCadastroDataChange(Sender: TObject;
 begin
   inherited;
   AtualizaPercLucro;
+
+  ibConsultaQtdeVendas.Close;
+  ibConsultaQtdeVendas.ParamByName('codigo').AsInteger := ibqCadastroCodigo.Asinteger;
+  ibConsultaQtdeVendas.Open;
+
+  EqtdeVenda.Text := intToStr(ibConsultaQtdeVendas.FieldByName('qtde_venda').AsInteger);
 end;
 
 procedure TfrmCadastroProdutos.dbeValorCustoChange(Sender: TObject);

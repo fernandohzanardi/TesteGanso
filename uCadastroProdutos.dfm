@@ -1,15 +1,16 @@
 inherited frmCadastroProdutos: TfrmCadastroProdutos
   Caption = 'Cadastro de Produtos'
-  ClientHeight = 290
-  ClientWidth = 598
+  ClientHeight = 285
+  ClientWidth = 586
+  StyleElements = [seFont, seClient, seBorder]
   OnActivate = FormActivate
-  ExplicitWidth = 614
-  ExplicitHeight = 329
-  PixelsPerInch = 96
+  ExplicitWidth = 602
+  ExplicitHeight = 324
   TextHeight = 15
   inherited pCampos: TPanel
-    Width = 598
-    Height = 244
+    Width = 586
+    Height = 239
+    StyleElements = [seFont, seClient, seBorder]
     ExplicitWidth = 598
     ExplicitHeight = 244
     object lCodigo: TLabel
@@ -100,6 +101,12 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
       Alignment = taRightJustify
       Caption = 'Estoque Atual :'
       FocusControl = dbeEstoqueAtual
+    end
+    object ImCliente: TImage
+      Left = 401
+      Top = 11
+      Width = 65
+      Height = 46
     end
     object dbeCodigo: TDBEdit
       Left = 118
@@ -198,33 +205,42 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
       DataSource = dsCadastro
       TabOrder = 8
     end
+    object EqtdeVenda: TEdit
+      Left = 472
+      Top = 210
+      Width = 100
+      Height = 23
+      TabOrder = 10
+    end
   end
   inherited pBotoes: TPanel
-    Top = 244
-    Width = 598
+    Top = 239
+    Width = 586
+    StyleElements = [seFont, seClient, seBorder]
     ExplicitTop = 244
     ExplicitWidth = 598
     inherited btnInserir: TButton
-      Left = 236
+      Left = 224
       ExplicitLeft = 236
     end
     inherited btnEditar: TButton
-      Left = 308
+      Left = 296
       ExplicitLeft = 308
     end
     inherited btnGravar: TButton
-      Left = 379
+      Left = 367
       ExplicitLeft = 379
     end
     inherited btnCancelar: TButton
-      Left = 450
+      Left = 438
       ExplicitLeft = 450
     end
     inherited btnExcluir: TButton
-      Left = 521
+      Left = 509
       ExplicitLeft = 521
     end
     inherited btnImprimir: TButton
+      Left = 687
       Visible = False
     end
   end
@@ -335,5 +351,31 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
       'where'
       '  CODIGO = :OLD_CODIGO')
     Top = 112
+  end
+  object ibConsultaQtdeVendas: TIBQuery
+    Database = dmConexao.IBDConexao
+    BufferChunks = 1000
+    CachedUpdates = False
+    ParamCheck = True
+    SQL.Strings = (
+      'select count(*) qtde_venda'
+      'from venda v'
+      '  join venda_item vi on vi.codigo_venda = v.codigo'
+      '  join produto p on p.codigo = vi.codigo_produto'
+      'where p.codigo = :codigo')
+    PrecommittedReads = False
+    Left = 344
+    Top = 200
+    ParamData = <
+      item
+        DataType = ftUnknown
+        Name = 'codigo'
+        ParamType = ptUnknown
+      end>
+    object ibConsultaQtdeVendasQTDE_VENDA: TIntegerField
+      FieldName = 'QTDE_VENDA'
+      ProviderFlags = []
+      ReadOnly = True
+    end
   end
 end
