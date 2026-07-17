@@ -44,6 +44,9 @@ type
     ibConsultaQtdeVendas: TIBQuery;
     ibConsultaQtdeVendasQTDE_VENDA: TIntegerField;
     EqtdeVenda: TEdit;
+    Button1: TButton;
+    Edit1: TEdit;
+    IBQuery1: TIBQuery;
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnInserirClick(Sender: TObject);
@@ -92,6 +95,9 @@ procedure TfrmCadastroProdutos.btnInserirClick(Sender: TObject);
 begin
   inherited;
   FocusEditarSalvar;
+  if True then
+    ShowMessage('Teste');
+
 end;
 
 procedure TfrmCadastroProdutos.FocusEditarSalvar;
