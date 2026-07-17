@@ -3426,6 +3426,19 @@ begin
                                 +StringReplace(QuotedStr(DateTimeToStr(RetornoData)),'/','.',[rfReplaceAll])+'as date))';
       _IBQuery999.Open;
 
+  //Validação para novo ramo
+  if _ParRamo = 'BUTECO' then
+    begin
+      _sqlF3 := 'SELECT B.CODIGO, B.DESCRICAO, BT.DESCRICAO_TIPO, BM.DESCRICAO_MARCA, B.DATA_COMPRA, B.VALOR_VENDA'
+           + 'FROM BEBIDA B'
+           + 'JOIN BEBIDA_TIPO BT ON BT.CODIGO_BEBIDA = B.CODIGO'
+           + 'JOIN BEBIDA_MARCA BM ON BM.CODIGO_BEBIDA = B.CODIGO'
+           + 'WHERE (B.CODIGO = ' + IntToStr(_Cod_bebida) + ') ';
+      _TabelaPrincipal := 'V_BEBIDA';
+
+      _Titulos := 'Teste de Conflito';
+    end;
+
   //Tenta enviar a mensagem - Caso dê algum problema (provavelmente time out) joga pro except,
   //mas de qualquer forma destroi os componentes
   try
