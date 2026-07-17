@@ -2,17 +2,16 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
   Caption = 'Cadastro de Produtos'
   ClientHeight = 285
   ClientWidth = 586
-  StyleElements = [seFont, seClient, seBorder]
   OnActivate = FormActivate
   ExplicitWidth = 602
   ExplicitHeight = 324
+  PixelsPerInch = 96
   TextHeight = 15
   inherited pCampos: TPanel
     Width = 586
     Height = 239
-    StyleElements = [seFont, seClient, seBorder]
-    ExplicitWidth = 598
-    ExplicitHeight = 244
+    ExplicitWidth = 586
+    ExplicitHeight = 239
     object lCodigo: TLabel
       Left = 67
       Top = 16
@@ -216,32 +215,40 @@ inherited frmCadastroProdutos: TfrmCadastroProdutos
   inherited pBotoes: TPanel
     Top = 239
     Width = 586
-    StyleElements = [seFont, seClient, seBorder]
-    ExplicitTop = 244
-    ExplicitWidth = 598
+    ExplicitTop = 239
+    ExplicitWidth = 586
     inherited btnInserir: TButton
       Left = 224
-      ExplicitLeft = 236
+      ExplicitLeft = 224
     end
     inherited btnEditar: TButton
       Left = 296
-      ExplicitLeft = 308
+      ExplicitLeft = 296
     end
     inherited btnGravar: TButton
       Left = 367
-      ExplicitLeft = 379
+      ExplicitLeft = 367
     end
     inherited btnCancelar: TButton
       Left = 438
-      ExplicitLeft = 450
+      ExplicitLeft = 438
     end
     inherited btnExcluir: TButton
       Left = 509
-      ExplicitLeft = 521
+      ExplicitLeft = 509
     end
     inherited btnImprimir: TButton
       Left = 687
       Visible = False
+      ExplicitLeft = 687
+    end
+    object Button1: TButton
+      Left = 143
+      Top = 12
+      Width = 75
+      Height = 25
+      Caption = 'Button1'
+      TabOrder = 10
     end
   end
   inherited ibqCadastro: TIBQuery

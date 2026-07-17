@@ -44,6 +44,7 @@ type
     ibConsultaQtdeVendas: TIBQuery;
     ibConsultaQtdeVendasQTDE_VENDA: TIntegerField;
     EqtdeVenda: TEdit;
+    Button1: TButton;
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnInserirClick(Sender: TObject);
@@ -92,6 +93,14 @@ procedure TfrmCadastroProdutos.btnInserirClick(Sender: TObject);
 begin
   inherited;
   FocusEditarSalvar;
+
+  if True then
+  begin
+  ibConsultaQtdeVendas.Close;
+  ibConsultaQtdeVendas.ParamByName('codigo').AsInteger := ibqCadastroCodigo.Asinteger;
+  ibConsultaQtdeVendas.Open;
+  end;
+
 end;
 
 procedure TfrmCadastroProdutos.FocusEditarSalvar;
